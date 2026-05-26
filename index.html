@@ -1,278 +1,1079 @@
+index.html
+1
+100%
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cinema Select — 映画ガチャ＆スケジュール</title>
-<style>.ic{display:inline-flex;align-items:center;justify-content:center;vertical-align:middle;flex-shrink:0}.ic svg{display:block}</style>
+<title>Cinema Select — 映画ガチャ＆スケジューラー</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Josefin+Sans:wght@300;400;600;700&family=Libre+Baskerville:ital,wght@0,400;1,400&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
-
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --black:#09090b;--dark:#111115;--surface:#18181e;--card:#1f1f27;--raised:#26262f;
-  --gold:#c9a84c;--gold-dim:#6b5520;--gold-pale:#f5e6b8;--gold-glow:rgba(201,168,76,.12);
-  --cream:#ede8dc;--muted:#7a7a88;--border:#2a2a35;--text:#ddd8cc;
-  --teal:#6ab4c4;--teal-dim:#2d5f6b;--teal-glow:rgba(106,180,196,.1);
-  --green:#5ec490;--green-dim:#1e5c3a;
-  --plan:#b07ee8;--plan-dim:#4a2d6b;--plan-glow:rgba(176,126,232,.1);
+/* ══════════════════════════════════════════
+   THEME VARIABLES
+══════════════════════════════════════════ */
+:root {
+  --transition-theme: background .4s ease, color .4s ease, border-color .3s ease;
 }
-body{background:var(--black);font-family:'Jost',sans-serif;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem}
 
-.app{width:100%;max-width:740px}
+/* ── HOLLYWOOD THEME ── */
+.theme-hollywood {
+  --bg:        #0a0704;
+  --bg-dark:   #060402;
+  --surface:   #120c04;
+  --card:      #1a1008;
+  --raised:    #221608;
+  --accent:    #c9922a;
+  --accent-light: #e8c060;
+  --accent-dim:#6a4a10;
+  --accent-pale:#f5e8c0;
+  --accent2:   #8b1a1a;
+  --text:      #f0e8d0;
+  --text-muted:#8a7050;
+  --border:    #2a1e08;
+  --border-hi: #c9922a;
+  --modal-glow:rgba(201,146,42,.15);
+  --ticket-bg: #1a1008;
+  --ticket-text:#c9a060;
+  --ticket-active-bg:#120c04;
+  --ticket-active-text:#e8c060;
+  --film-bg:   #080603;
+  --tl-accent: #c9922a;
+  --tl-line:   #6a4a10;
+  --summary-val:#e8c060;
+  --font-display:'Playfair Display',serif;
+  --font-body:  'Josefin Sans',sans-serif;
+  --font-mono:  'Libre Baskerville',serif;
+  --title-size: clamp(2.4rem,7vw,4rem);
+  --title-shadow: 0 2px 20px rgba(201,146,42,.25);
+  --header-bg: linear-gradient(180deg,#1a0e04 0%,transparent 100%);
+  --scanlines: none;
+  --glitch: none;
+}
 
-/* ── HEADER ── */
-.hdr{text-align:center;padding:2.5rem 2rem 2rem;position:relative}
-.hdr-rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin-bottom:1.75rem}
-.hdr-eyebrow{font-size:10px;letter-spacing:8px;color:var(--gold);text-transform:uppercase;font-family:'Jost',sans-serif;font-weight:300;margin-bottom:.6rem}
-.hdr-title{font-family:'Cormorant Garamond',serif;font-size:2.4rem;font-weight:600;color:var(--cream);letter-spacing:1px;line-height:1.1}
-.hdr-title em{font-style:italic;color:var(--gold)}
-.hdr-sub{font-size:11px;letter-spacing:3px;color:var(--muted);margin-top:.6rem;font-weight:300}
-.hdr-rule-bot{height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent);margin-top:1.75rem}
+/* ── GRINDHOUSE THEME ── */
+.theme-grindhouse {
+  --bg:        #050505;
+  --bg-dark:   #030303;
+  --surface:   #0d0d0d;
+  --card:      #111;
+  --raised:    #161616;
+  --accent:    #e8152a;
+  --accent-light:#ff4d5e;
+  --accent-dim:#5a0810;
+  --accent-pale:#fff0f0;
+  --accent2:   #ffcc00;
+  --text:      #f0f0f0;
+  --text-muted:#555;
+  --border:    #1e1e1e;
+  --border-hi: #e8152a;
+  --modal-glow:rgba(232,21,42,.15);
+  --ticket-bg: #111;
+  --ticket-text:#f0f0f0;
+  --ticket-active-bg:#0d0503;
+  --ticket-active-text:#ffcc00;
+  --film-bg:   #080808;
+  --tl-accent: #ffcc00;
+  --tl-line:   #5a0810;
+  --summary-val:#f0f0f0;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:  'Barlow Condensed',sans-serif;
+  --font-mono:  'Special Elite',serif;
+  --title-size: clamp(3rem,10vw,6rem);
+  --title-shadow: 3px 3px 0 #e8152a,-1px -1px 0 #00e5ff,0 0 30px rgba(232,21,42,.3);
+  --header-bg: linear-gradient(180deg,#0a0000 0%,transparent 100%);
+  --scanlines: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px);
+  --glitch: 1;
+}
 
-/* ── TABS ── */
-.tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:0;background:var(--dark)}
-.tb{flex:1;padding:12px;font-size:10px;letter-spacing:4px;text-transform:uppercase;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;color:var(--muted);transition:all .2s;font-family:'Jost',sans-serif;font-weight:400}
-.tb:hover{color:var(--text)}
-.tb.at{color:var(--gold);border-bottom-color:var(--gold)}
-.tb.atm{color:var(--teal);border-bottom-color:var(--teal)}
+/* ══════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  font-family:var(--font-body);
+  min-height:100vh;
+  overflow-x:hidden;
+  transition:background .4s ease;
+}
+/* VHS scanlines - grindhouse only */
+body.theme-grindhouse::after{
+  content:'';position:fixed;inset:0;
+  background:var(--scanlines);
+  pointer-events:none;z-index:9998;
+  animation:scanroll 8s linear infinite;
+}
+@keyframes scanroll{0%{background-position:0 0}100%{background-position:0 100%}}
 
-/* ── PANELS ── */
+/* Grain - hollywood only */
+body.theme-hollywood::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9997;opacity:.5;
+}
+
+.app{max-width:720px;margin:0 auto;padding:0 0 4rem}
+
+/* ══════════════════════════════════════════
+   THEME SWITCHER
+══════════════════════════════════════════ */
+.theme-switcher{
+  display:flex;justify-content:center;
+  padding:1rem 1.5rem .5rem;
+  gap:0;
+  position:relative;z-index:10;
+}
+.theme-btn{
+  padding:8px 24px;
+  font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .25s;
+  border:1px solid;
+  background:transparent;
+  display:flex;align-items:center;gap:6px;
+}
+.theme-btn:first-child{border-radius:3px 0 0 3px;border-right:none}
+.theme-btn:last-child{border-radius:0 3px 3px 0}
+
+/* Hollywood switcher style */
+.theme-hollywood .theme-btn{
+  font-family:'Josefin Sans',sans-serif;
+  border-color:#3a2a08;color:var(--text-muted);
+}
+.theme-hollywood .theme-btn.active{
+  background:rgba(201,146,42,.1);
+  border-color:var(--accent);color:var(--accent-light);
+  box-shadow:0 0 15px rgba(201,146,42,.2);
+}
+.theme-hollywood .theme-btn:hover:not(.active){
+  border-color:#6a4a10;color:var(--accent);
+}
+
+/* Grindhouse switcher style */
+.theme-grindhouse .theme-btn{
+  font-family:'Bebas Neue',sans-serif;
+  letter-spacing:4px;font-size:12px;
+  border-color:#1e1e1e;color:var(--text-muted);
+}
+.theme-grindhouse .theme-btn.active{
+  background:rgba(232,21,42,.1);
+  border-color:var(--accent);color:var(--accent);
+  box-shadow:0 0 12px rgba(232,21,42,.25);
+}
+.theme-grindhouse .theme-btn:hover:not(.active){
+  border-color:#333;color:#aaa;
+}
+
+/* ══════════════════════════════════════════
+   HEADER
+══════════════════════════════════════════ */
+.header{
+  padding:2rem 1.5rem 1.5rem;
+  position:relative;overflow:hidden;
+  background:var(--header-bg);
+}
+
+/* Hollywood header */
+.theme-hollywood .header-ornament{
+  display:flex;align-items:center;gap:12px;
+  justify-content:center;margin-bottom:1.25rem;
+}
+.theme-hollywood .orn-line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--accent))}
+.theme-hollywood .orn-line.r{background:linear-gradient(90deg,var(--accent),transparent)}
+.theme-hollywood .orn-star{color:var(--accent);font-size:10px;letter-spacing:4px}
+.theme-grindhouse .header-ornament{display:none}
+
+.header-tape{
+  display:none;
+  background:var(--accent);
+  padding:3px 0;text-align:center;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:10px;letter-spacing:8px;
+  color:rgba(255,255,255,.9);
+  margin-bottom:1.5rem;
+  box-shadow:0 0 20px rgba(232,21,42,.4);
+}
+.theme-grindhouse .header-tape{display:block}
+
+.header-content{text-align:center;position:relative;z-index:1}
+
+.header-eyebrow{
+  font-size:9px;letter-spacing:7px;
+  color:var(--accent-dim);text-transform:uppercase;
+  margin-bottom:.6rem;
+}
+.theme-grindhouse .header-eyebrow{display:none}
+
+.header-rating{
+  display:none;
+  font-family:'Bebas Neue',sans-serif;
+  border:2px solid var(--accent);
+  color:var(--accent);
+  font-size:11px;letter-spacing:3px;
+  padding:2px 10px;margin-bottom:.75rem;
+}
+.theme-grindhouse .header-rating{display:inline-block}
+
+.header-title{
+  font-family:var(--font-display);
+  font-size:var(--title-size);
+  color:var(--accent-light);
+  line-height:.88;letter-spacing:3px;
+  margin-bottom:.35rem;
+  text-shadow:var(--title-shadow);
+  transition:all .4s ease;
+}
+.theme-hollywood .header-title{font-weight:900;letter-spacing:2px}
+
+.header-title-sub{
+  font-family:var(--font-display);
+  font-size:clamp(.9rem,2.5vw,1.3rem);
+  color:var(--accent);
+  margin-bottom:.75rem;
+  transition:all .4s ease;
+}
+.theme-hollywood .header-title-sub{font-style:italic;font-weight:400}
+.theme-grindhouse .header-title-sub{font-family:'Bebas Neue',sans-serif;letter-spacing:5px;color:var(--accent2)}
+
+.header-rule{
+  height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  margin:.75rem auto 0;max-width:400px;
+  transition:all .4s ease;
+}
+.theme-grindhouse .header-rule{
+  background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),#00e5ff,transparent);
+  box-shadow:0 0 10px rgba(232,21,42,.3);
+}
+
+.header-sub{font-size:9px;letter-spacing:4px;color:var(--text-muted);text-transform:uppercase;margin-top:.5rem}
+.theme-grindhouse .header-sub{font-family:'Special Elite',serif;font-style:italic}
+
+/* Hollywood ornament divider */
+.header-rule-box{
+  display:flex;align-items:center;gap:10px;
+  justify-content:center;margin:.6rem 0 .4rem;
+}
+.theme-grindhouse .header-rule-box{display:none}
+.hrb-line{flex:1;max-width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--accent-dim))}
+.hrb-line.r{background:linear-gradient(90deg,var(--accent-dim),transparent)}
+.hrb-diamond{width:7px;height:7px;background:var(--accent);transform:rotate(45deg);box-shadow:0 0 8px rgba(201,146,42,.4)}
+
+/* ══════════════════════════════════════════
+   TICKET TABS
+══════════════════════════════════════════ */
+.ticket-row{
+  display:flex;gap:14px;
+  padding:1.25rem 1.5rem 1.25rem;
+  justify-content:center;
+}
+.ticket{
+  flex:1;max-width:280px;
+  background:var(--ticket-bg);
+  border:1px solid var(--border);
+  border-radius:3px;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:all .25s;
+  box-shadow:0 4px 20px rgba(0,0,0,.5);
+}
+
+/* Active indicator strip */
+.ticket::after{
+  content:'';
+  position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .3s ease;
+  box-shadow:0 0 8px var(--accent);
+}
+.ticket.active::after{transform:scaleX(1)}
+
+/* Hollywood ticket: dark unified look */
+.theme-hollywood .ticket{background:var(--ticket-bg)}
+.theme-hollywood .ticket.active{
+  background:var(--ticket-active-bg);
+  border-color:var(--border-hi);
+  box-shadow:0 0 25px rgba(201,146,42,.3),0 4px 20px rgba(0,0,0,.6);
+}
+.theme-hollywood .ticket:not(.active){opacity:.6}
+.theme-hollywood .ticket:hover:not(.active){opacity:.85;transform:translateY(-2px)}
+
+/* Hollywood perforations */
+.ticket-perf-top,.ticket-perf-bot{
+  height:1px;
+  background:repeating-linear-gradient(90deg,transparent,transparent 6px,var(--border-hi) 6px,var(--border-hi) 12px);
+  opacity:.4;
+  margin:0 8px;
+}
+.ticket-perf-top{margin-top:6px}
+.ticket-perf-bot{margin-bottom:6px}
+.theme-grindhouse .ticket-perf-top,
+.theme-grindhouse .ticket-perf-bot{display:none}
+
+.ticket-inner{display:flex;align-items:stretch}
+.ticket-stub{
+  width:36px;flex-shrink:0;
+  background:rgba(0,0,0,.15);
+  border-right:2px dashed rgba(255,255,255,.1);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.theme-hollywood .ticket-stub{background:rgba(0,0,0,.08);border-right-color:rgba(100,70,20,.3)}
+.ticket-stub::before,.ticket-stub::after{
+  content:'';position:absolute;
+  left:50%;transform:translateX(-50%);
+  width:14px;height:14px;border-radius:50%;
+  background:var(--bg);border:1px solid var(--border);
+}
+.ticket-stub::before{top:-7px}
+.ticket-stub::after{bottom:-7px}
+.ticket-stub-text{
+  font-family:var(--font-display);
+  font-size:8px;letter-spacing:3px;
+  color:var(--text-muted);
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  text-transform:uppercase;
+}
+.theme-hollywood .ticket.active .ticket-stub-text{color:var(--accent-dim)}
+.theme-grindhouse .ticket.active .ticket-stub-text{color:var(--accent-dim)}
+
+.ticket-body{padding:.75rem 1rem;flex:1}
+.ticket-label{
+  font-size:8px;letter-spacing:5px;
+  color:var(--text-muted);text-transform:uppercase;
+  margin-bottom:.2rem;font-family:var(--font-body);
+}
+.ticket-name{
+  font-family:var(--font-display);
+  font-size:1.05rem;
+  color:var(--text);letter-spacing:1px;
+  margin-bottom:.2rem;line-height:1;
+  transition:color .3s;
+}
+.theme-hollywood .ticket-name{font-weight:700;color:#c9a060}
+.theme-hollywood .ticket:not(.active) .ticket-name{color:#8a6a30}
+.theme-grindhouse .ticket-name{font-size:1.15rem;letter-spacing:2px}
+.ticket.active .ticket-name{color:var(--ticket-active-text)}
+.ticket-num{font-size:9px;color:var(--text-muted);font-family:var(--font-mono)}
+
+/* Grindhouse: non-active dim */
+.theme-grindhouse .ticket:not(.active){opacity:.6}
+.theme-grindhouse .ticket:hover:not(.active){opacity:.85;transform:translateY(-1px)}
+.theme-grindhouse .ticket.active{
+  border-color:#c8a020;
+  box-shadow:0 0 20px rgba(200,160,32,.2),0 4px 20px rgba(0,0,0,.6);
+}
+/* チケット上部のアクセントラインを黄色に */
+.theme-grindhouse .ticket::after{
+  background:#ffcc00;
+  box-shadow:0 0 8px #ffcc00;
+}
+/* 選択中チケットのテキスト色も黄色系に */
+.theme-grindhouse .ticket.active .ticket-stub-text{color:#8a6e10}
+.theme-grindhouse .ticket-active-text{color:#ffcc00}
+
+/* ══════════════════════════════════════════
+   FILM ROLL
+══════════════════════════════════════════ */
+.filmroll-wrap{padding:0;margin-bottom:1.5rem}
+.filmroll{
+  background:var(--film-bg);
+  border-radius:0;overflow:hidden;
+  border:0;
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 4px 20px rgba(0,0,0,.6),inset 0 0 20px rgba(0,0,0,.4);
+}
+.theme-hollywood .filmroll{
+  border-top-color:rgba(201,146,42,.35);
+  border-bottom-color:rgba(201,146,42,.35);
+}
+.theme-grindhouse .filmroll{
+  border-top-color:#9a7a14;
+  border-bottom-color:#9a7a14;
+  box-shadow:0 4px 20px rgba(0,0,0,.8),0 0 8px rgba(154,122,20,.2),inset 0 0 20px rgba(0,0,0,.5);
+}
+.filmroll-perf{
+  display:flex;padding:5px 0;
+  background:#0a0a0a;
+}
+.theme-hollywood .filmroll-perf{
+  background-color:#100a02;
+}
+.theme-grindhouse .filmroll-perf{
+  background-color:#0e0c00;
+}
+.filmroll-perf.bot{border-top:1px solid var(--border)}
+.filmroll-perf:not(.bot){border-bottom:1px solid var(--border)}
+.theme-grindhouse .filmroll-perf.bot{border-top-color:#6b5510}
+.theme-grindhouse .filmroll-perf:not(.bot){border-bottom-color:#6b5510}
+.perf-hole{
+  width:17px;height:12px;border-radius:3px;
+  background:#000;
+  flex-shrink:0;margin:0 3px;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.9);
+}
+.theme-hollywood .perf-hole{
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1px rgba(201,146,42,.28);
+}
+.theme-grindhouse .perf-hole{
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1.5px rgba(154,122,20,.45);
+}
+.filmroll-track{overflow:hidden;padding:8px 0;background:var(--surface)}
+.filmroll-inner{
+  display:flex;gap:7px;padding:0 10px;
+  animation:filmscroll 22s linear infinite;
+  width:max-content;
+}
+.filmroll-inner:hover{animation-play-state:paused}
+@keyframes filmscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+.film-frame{
+  flex-shrink:0;
+  padding:10px 16px;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:2px;
+  cursor:pointer;
+  transition:all .18s;
+  text-align:center;min-width:130px;
+  position:relative;overflow:hidden;
+}
+.film-frame::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);
+  pointer-events:none;
+}
+.film-frame:hover{
+  background:var(--raised);
+  border-color:var(--accent);
+  transform:scale(1.04);
+  box-shadow:0 0 16px rgba(var(--accent),.2);
+}
+.theme-grindhouse .film-frame:hover{box-shadow:0 0 16px rgba(232,21,42,.25)}
+.theme-hollywood .film-frame:hover{box-shadow:0 0 16px rgba(201,146,42,.2)}
+
+.film-icon{font-size:18px;margin-bottom:4px;display:block}
+.film-label{
+  font-family:var(--font-display);
+  font-size:12px;color:var(--text);white-space:nowrap;letter-spacing:1px;
+}
+.theme-grindhouse .film-label{font-size:13px;letter-spacing:2px}
+.film-sublabel{
+  font-family:var(--font-mono);font-size:8px;
+  color:var(--text-muted);letter-spacing:1px;margin-top:2px;
+}
+.theme-hollywood .film-sublabel{font-style:italic}
+
 .pane{display:none}
 .pane.vis{display:block}
 
-/* ── MOOD GRID ── */
-.mood-section{padding:1.75rem 1.75rem 1.25rem;background:var(--dark)}
-.mood-label{font-size:10px;letter-spacing:5px;color:var(--gold-dim);text-transform:uppercase;text-align:center;margin-bottom:1.25rem;font-weight:300}
-.mood-label.mini{color:var(--teal-dim)}
-.mood-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px}
-.mb{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 8px 12px;cursor:pointer;transition:all .18s;text-align:center;position:relative;overflow:hidden}
-.mb::after{content:'';position:absolute;inset:0;background:var(--gold-glow);opacity:0;transition:opacity .18s}
-.mb:hover{border-color:var(--gold-dim);transform:translateY(-2px)}
-.mb:hover::after{opacity:1}
-.mb.ac{border-color:var(--gold);background:var(--card)}
-.mb.ac::after{opacity:1}
-.mb.mm::after{background:var(--teal-glow)}
-.mb.mm:hover{border-color:var(--teal-dim)}
-.mb.mm.ac{border-color:var(--teal)}
-.mb-icon{margin-bottom:6px;display:flex;justify-content:center;color:var(--text)}
-.mb-name{font-size:11px;font-weight:500;color:var(--cream);display:block;margin-bottom:2px;letter-spacing:.5px}
-.mb-desc{font-size:9px;color:var(--muted);display:block;letter-spacing:.5px}
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.88);
+  z-index:1000;
+  display:flex;align-items:center;justify-content:center;
+  padding:1rem;
+  opacity:0;pointer-events:none;
+  transition:opacity .32s ease;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--bg);
+  border:1px solid var(--border-hi);
+  border-radius:3px;
+  width:100%;max-width:600px;
+  max-height:90vh;overflow-y:auto;
+  position:relative;
+  transform:translateY(18px) scale(.97);
+  transition:transform .32s ease;
+  box-shadow:0 20px 70px rgba(0,0,0,.85),0 0 0 1px var(--modal-glow);
+}
+.modal-overlay.open .modal{transform:translateY(0) scale(1)}
 
-/* ── RESULT ── */
-.result-wrap{background:var(--dark);padding:0 1.75rem 1.75rem}
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin-bottom:1.5rem}
+/* Top accent line */
+.modal::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--accent);
+  box-shadow:0 0 10px var(--accent);
+  z-index:2;
+}
+.theme-grindhouse .modal::before{
+  background:linear-gradient(90deg,var(--accent),var(--accent2),#00e5ff);
+}
 
-.empty-state{text-align:center;padding:3rem 2rem;color:var(--muted)}
-.empty-icon{font-size:40px;opacity:.25;margin-bottom:1rem;display:block}
-.empty-text{font-size:12px;letter-spacing:2px;font-weight:300}
+/* Hollywood corner ornaments */
+.modal-corner{
+  position:absolute;width:14px;height:14px;
+  border-color:var(--accent);border-style:solid;z-index:3;
+}
+.modal-corner.tl{top:8px;left:8px;border-width:1px 0 0 1px}
+.modal-corner.tr{top:8px;right:8px;border-width:1px 1px 0 0}
+.modal-corner.bl{bottom:8px;left:8px;border-width:0 0 1px 1px}
+.modal-corner.br{bottom:8px;right:8px;border-width:0 1px 1px 0}
+.theme-grindhouse .modal-corner{display:none}
 
-/* ── MOVIE CARD ── */
-.movie-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;opacity:0;transform:translateY(14px);transition:opacity .4s ease,transform .4s ease}
-.movie-card.show{opacity:1;transform:translateY(0)}
+.modal-banner{
+  background:var(--bg-dark);
+  border-bottom:1px solid var(--border);
+  padding:10px 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:3px;
+}
+.modal-now-playing{
+  font-family:var(--font-display);
+  font-size:9px;letter-spacing:6px;
+  color:var(--accent);text-transform:uppercase;
+}
+.theme-grindhouse .modal-now-playing{font-size:11px;text-shadow:0 0 10px rgba(232,21,42,.5)}
+.modal-genre-badge{
+  font-family:var(--font-display);
+  font-size:9px;padding:2px 10px;
+  border:1px solid var(--accent-dim);
+  color:var(--accent);letter-spacing:2px;
+}
+.theme-grindhouse .modal-genre-badge{font-size:10px}
 
-.card-banner{background:var(--card);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.now-showing{font-size:8px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;font-weight:300}
-.now-showing.mini{color:var(--teal)}
-.badge-row{display:flex;gap:6px;align-items:center}
-.genre-badge{font-size:9px;padding:3px 10px;border-radius:20px;border:1px solid var(--gold-dim);color:var(--gold);letter-spacing:1px}
-.genre-badge.mini{border-color:var(--teal-dim);color:var(--teal)}
-.origin-badge{font-size:9px;padding:2px 8px;border-radius:20px;background:rgba(106,180,196,.08);border:1px solid var(--teal-dim);color:var(--teal);letter-spacing:1px}
+.modal-body{padding:1.5rem}
+.modal-title{
+  font-family:var(--font-mono);font-size:13px;
+  color:var(--text-muted);margin-bottom:2px;letter-spacing:1px;
+  text-shadow:none;
+  transition:all .3s;
+  line-height:1.4;
+}
+.theme-hollywood .modal-title{font-style:italic;font-weight:400}
+.theme-grindhouse .modal-title{letter-spacing:2px;font-size:12px;animation:none;color:#888}
 
-.card-body{padding:1.4rem 1.6rem}
-.movie-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;color:var(--cream);margin-bottom:3px;line-height:1.1}
-.movie-title-jp{font-size:11px;color:var(--muted);margin-bottom:1rem;letter-spacing:1px;font-weight:300}
-.meta-row{display:flex;gap:16px;margin-bottom:1.1rem;flex-wrap:wrap}
-.meta-item{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px}
-.meta-dot{width:3px;height:3px;border-radius:50%;background:var(--gold-dim);flex-shrink:0}
-.meta-dot.mini{background:var(--teal-dim)}
-.meta-val{color:var(--text)}
-.section-label{font-size:8px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-dim);margin-bottom:7px;font-weight:300}
-.section-label.mini{color:var(--teal-dim)}
-.synopsis{font-size:13px;color:var(--text);line-height:1.75;margin-bottom:1.1rem}
-.highlight-box{background:var(--card);border-left:2px solid var(--gold-dim);padding:10px 14px;border-radius:0 6px 6px 0}
-.highlight-box.mini{border-left-color:var(--teal-dim)}
-.highlight-text{font-size:12px;color:var(--text);line-height:1.65}
+.modal-title-jp{
+  font-family:var(--font-display);
+  font-size:clamp(1.5rem,5vw,2.2rem);
+  color:var(--accent-light);
+  line-height:.9;margin-bottom:1rem;letter-spacing:1px;
+  text-shadow:var(--title-shadow);
+  transition:all .3s;
+}
+.theme-hollywood .modal-title-jp{font-weight:900;font-style:normal}
+.theme-grindhouse .modal-title-jp{
+  letter-spacing:3px;
+  font-size:clamp(1.8rem,5vw,2.6rem);
+  animation:none;
+  text-shadow:2px 2px 0 rgba(232,21,42,.4),0 0 16px rgba(232,21,42,.15);
+}
 
-.card-footer{border-top:1px solid var(--border);padding:12px 1.6rem;display:flex;align-items:center;justify-content:space-between;background:var(--card);gap:8px;flex-wrap:wrap}
-.runtime{font-size:11px;color:var(--muted)}
-.runtime span{color:var(--gold);font-weight:500}
-.runtime span.mini{color:var(--teal)}
-.footer-btns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.modal-meta{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:1rem}
+.modal-meta-item{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:5px}
+.modal-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--accent-dim);flex-shrink:0}
+.modal-meta-val{color:var(--accent-pale)}
 
-/* ── BUTTONS ── */
-.btn{background:transparent;border-radius:20px;padding:6px 16px;font-size:10px;cursor:pointer;letter-spacing:2px;transition:all .2s;font-family:'Jost',sans-serif;font-weight:400;text-decoration:none;display:inline-flex;align-items:center;gap:5px;border:1px solid}
-.btn-gold{border-color:var(--gold-dim);color:var(--gold)}
-.btn-gold:hover{border-color:var(--gold);background:var(--gold-glow)}
-.btn-gold.mini{border-color:var(--teal-dim);color:var(--teal)}
-.btn-gold.mini:hover{border-color:var(--teal);background:var(--teal-glow)}
-.btn-green{border-color:var(--green-dim);color:var(--green)}
-.btn-green:hover{border-color:var(--green);background:rgba(94,196,144,.08)}
-.btn-plan{border-color:var(--plan-dim);color:var(--plan)}
-.btn-plan:hover{border-color:var(--plan);background:var(--plan-glow)}
+.modal-rule{height:1px;background:linear-gradient(90deg,var(--accent-dim),transparent);margin:1rem 0}
 
-.jw-note{font-size:10px;color:var(--muted);text-align:center;padding:6px 1.6rem 0;line-height:1.6}
+.modal-section-label{
+  font-family:var(--font-display);
+  font-size:9px;letter-spacing:5px;
+  text-transform:uppercase;color:var(--accent);
+  margin-bottom:.5rem;
+}
+.theme-grindhouse .modal-section-label::before{content:'// '}
 
-/* ── PLAN SECTION ── */
-.plan-section{background:var(--dark);padding:0 1.75rem 1.75rem;overflow:hidden;max-height:0;transition:max-height .5s ease,opacity .4s ease;opacity:0}
+.modal-synopsis{
+  font-family:var(--font-mono);font-size:13px;
+  color:var(--text);line-height:1.78;margin-bottom:1rem;
+}
+.theme-grindhouse .modal-synopsis{font-family:'Barlow Condensed',sans-serif;font-size:14px}
+
+.modal-highlight{
+  background:var(--card);
+  border-left:2px solid var(--accent-dim);
+  padding:10px 14px;border-radius:0 3px 3px 0;
+}
+.modal-highlight-text{
+  font-family:var(--font-mono);font-size:12px;
+  color:var(--text-muted);line-height:1.7;
+}
+.theme-hollywood .modal-highlight-text{font-style:italic}
+
+.modal-footer{
+  border-top:1px solid var(--border);
+  padding:12px 1.5rem;
+  display:flex;align-items:center;
+  justify-content:space-between;
+  background:var(--bg-dark);
+  gap:8px;flex-wrap:wrap;
+}
+.modal-runtime{font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
+.modal-runtime strong{color:var(--accent-light)}
+.modal-btns{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+
+/* ══════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════ */
+.btn{
+  background:transparent;
+  border-radius:2px;
+  padding:7px 14px;
+  font-family:var(--font-display);
+  font-size:10px;letter-spacing:3px;
+  cursor:pointer;transition:all .18s;
+  text-decoration:none;
+  display:inline-flex;align-items:center;gap:5px;
+  border:1px solid;text-transform:uppercase;
+}
+.theme-hollywood .btn{font-family:'Josefin Sans',sans-serif;font-weight:600;border-radius:2px}
+.theme-grindhouse .btn{font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;border-radius:1px}
+
+.btn-primary{border-color:var(--accent-dim);color:var(--accent)}
+.btn-primary:hover{border-color:var(--accent);background:rgba(var(--accent),0.08);box-shadow:0 0 10px var(--modal-glow)}
+.theme-hollywood .btn-primary:hover{box-shadow:0 0 10px rgba(201,146,42,.15)}
+.theme-grindhouse .btn-primary:hover{box-shadow:0 0 10px rgba(232,21,42,.2)}
+
+.btn-secondary{border-color:var(--border);color:var(--text-muted)}
+.btn-secondary:hover{border-color:var(--text-muted);color:var(--text)}
+
+.btn-green{border-color:#1e4a28;color:#5ec490}
+.btn-green:hover{border-color:#5ec490;background:rgba(94,196,144,.07)}
+
+/* ══════════════════════════════════════════
+   PLAN / SCHEDULER
+══════════════════════════════════════════ */
+.plan-section{
+  padding:0 1.5rem 2rem;
+  overflow:hidden;max-height:0;
+  transition:max-height .5s ease,opacity .4s ease;
+  opacity:0;
+}
 .plan-section.open{max-height:2000px;opacity:1}
 
-.plan-header{display:flex;align-items:center;gap:10px;padding:1.4rem 0 1.2rem;border-top:1px solid var(--border)}
-.plan-header-icon{width:32px;height:32px;border-radius:8px;background:var(--plan-glow);border:1px solid var(--plan-dim);display:flex;align-items:center;justify-content:center;color:var(--plan);font-size:16px;flex-shrink:0}
-.plan-header-text{flex:1}
-.plan-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--cream)}
-.plan-sub{font-size:10px;color:var(--muted);letter-spacing:1px;font-weight:300}
+.plan-header{
+  display:flex;align-items:center;gap:10px;
+  padding:1.25rem 0 1rem;
+  border-top:1px solid var(--border);
+}
+.plan-header-icon{
+  width:32px;height:32px;
+  background:var(--modal-glow);
+  border:1px solid var(--accent-dim);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--accent);font-size:14px;flex-shrink:0;border-radius:2px;
+}
+.plan-title{font-family:var(--font-display);font-size:1.2rem;color:var(--text);letter-spacing:2px}
+.theme-hollywood .plan-title{font-weight:700}
+.plan-sub{font-family:var(--font-mono);font-size:9px;color:var(--text-muted);letter-spacing:2px}
+.theme-hollywood .plan-sub{font-style:italic}
 
-.plan-movie-name{font-size:12px;color:var(--plan);letter-spacing:1px;font-weight:400;margin-bottom:1rem;padding:8px 12px;background:var(--plan-glow);border:1px solid var(--plan-dim);border-radius:6px;display:flex;align-items:center;gap:8px}
+.plan-movie-tag{
+  font-size:12px;color:var(--accent);
+  padding:8px 12px;
+  background:var(--modal-glow);
+  border:1px solid var(--border);
+  border-radius:2px;margin-bottom:1rem;
+  display:flex;align-items:center;gap:8px;
+  font-family:var(--font-mono);
+}
+.theme-hollywood .plan-movie-tag{font-style:italic}
 
-/* start time row */
 .start-row{display:flex;gap:10px;align-items:flex-end;margin-bottom:1.25rem;flex-wrap:wrap}
 .input-group{display:flex;flex-direction:column;gap:5px}
-.input-label{font-size:9px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);font-weight:300}
-.time-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:14px;color:var(--cream);font-family:'Jost',sans-serif;width:110px;transition:border-color .2s}
-.time-input:focus{outline:none;border-color:var(--plan-dim)}
-.time-input:hover{border-color:var(--border)}
+.input-label{
+  font-family:var(--font-display);
+  font-size:8px;letter-spacing:4px;
+  text-transform:uppercase;color:var(--text-muted);
+}
+.time-input,.break-input{
+  background:var(--card);border:1px solid var(--border);border-radius:2px;
+  padding:8px 14px;font-size:14px;color:var(--text);
+  font-family:var(--font-body);transition:border-color .18s;
+}
+.time-input{width:110px}
+.break-input{width:80px}
+.time-input:focus,.break-input:focus{outline:none;border-color:var(--accent-dim)}
 
-/* timeline */
-.timeline{display:flex;flex-direction:column;gap:0}
-.tl-item{display:flex;gap:0;position:relative}
+/* Timeline */
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex}
 .tl-left{width:56px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:4px}
-.tl-time{font-size:11px;color:var(--plan);font-weight:500;letter-spacing:.5px;white-space:nowrap}
-.tl-line{width:1px;background:var(--plan-dim);flex:1;margin-top:4px;min-height:20px}
-.tl-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--plan);background:var(--black);flex-shrink:0;margin-top:6px}
-.tl-dot.end{border-color:var(--gold);background:var(--black)}
+.tl-time{font-family:var(--font-display);font-size:11px;color:var(--tl-accent);letter-spacing:.5px;white-space:nowrap}
+.theme-grindhouse .tl-time{font-size:13px;letter-spacing:1px}
+.tl-line{width:1px;background:var(--tl-line);flex:1;margin-top:4px;min-height:20px}
+.tl-dot{width:8px;height:8px;border-radius:50%;border:2px solid var(--accent);background:var(--bg);flex-shrink:0;margin-top:6px}
 .tl-content{flex:1;padding-bottom:16px;padding-left:12px}
-.tl-card{background:var(--card);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:border-color .2s}
-.tl-card:hover{border-color:var(--plan-dim)}
-.tl-card-head{background:var(--raised);padding:8px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
-.tl-card-num{font-size:8px;letter-spacing:4px;color:var(--plan);text-transform:uppercase;font-weight:300}
-.tl-card-genre{font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--plan-dim);color:var(--plan)}
+.tl-card{background:var(--card);border:1px solid var(--border);border-radius:2px;overflow:hidden;transition:border-color .18s}
+.tl-card:hover{border-color:var(--accent-dim)}
+.tl-card-head{background:var(--bg-dark);padding:7px 12px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.tl-card-num{font-family:var(--font-display);font-size:9px;letter-spacing:4px;color:var(--accent);text-transform:uppercase}
+.tl-card-genre{font-family:var(--font-display);font-size:9px;padding:2px 8px;border:1px solid var(--accent-dim);color:var(--accent);letter-spacing:1px}
 .tl-card-body{padding:10px 12px}
-.tl-movie-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--cream);margin-bottom:2px}
-.tl-movie-jp{font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.5px}
-.tl-duration-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
-.tl-duration-fill{height:100%;background:linear-gradient(90deg,var(--plan-dim),var(--plan));border-radius:2px;transition:width .6s ease}
-.tl-time-range{font-size:11px;color:var(--muted);display:flex;gap:8px;align-items:center}
-.tl-time-val{color:var(--text);font-weight:500}
-.tl-arrow{color:var(--muted);font-size:10px}
-
-/* break item */
-.tl-break{background:var(--surface);border:1px dashed var(--border);border-radius:8px;padding:8px 12px;display:flex;align-items:center;gap:8px}
-.tl-break-icon{color:var(--muted);font-size:14px}
-.tl-break-text{font-size:11px;color:var(--muted)}
-.tl-break-min{color:var(--text);font-weight:500}
-
-/* end node */
-.tl-end{display:flex;gap:0}
+.tl-movie-title{font-family:var(--font-display);font-size:1rem;color:var(--text);margin-bottom:2px;letter-spacing:1px}
+.theme-hollywood .tl-movie-title{font-weight:700}
+.tl-movie-jp{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-bottom:6px}
+.theme-hollywood .tl-movie-jp{font-style:italic}
+.tl-duration-bar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.tl-duration-fill{height:100%;background:linear-gradient(90deg,var(--accent-dim),var(--accent));transition:width .6s ease}
+.tl-time-range{font-size:12px;color:var(--text-muted);display:flex;gap:8px;align-items:center;font-family:var(--font-body)}
+.tl-time-val{color:var(--accent-pale);font-weight:600}
+.tl-break{background:var(--bg-dark);border:1px dashed var(--border);border-radius:2px;padding:8px 12px;display:flex;align-items:center;gap:8px}
+.tl-break-text{font-size:12px;color:var(--text-muted);font-family:var(--font-mono)}
+.theme-hollywood .tl-break-text{font-style:italic}
+.tl-break-min{color:var(--accent-pale);font-weight:600}
+.tl-end{display:flex}
 .tl-end-left{width:56px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;padding-top:4px}
-.tl-end-time{font-size:12px;color:var(--gold);font-weight:500}
-.tl-end-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--gold);background:var(--gold);margin-top:5px}
+.tl-end-time{font-family:var(--font-display);font-size:12px;color:var(--tl-accent);font-weight:600}
+.theme-grindhouse .tl-end-time{font-size:14px}
+.tl-end-dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--tl-accent);background:var(--tl-accent);margin-top:5px;box-shadow:0 0 8px var(--modal-glow)}
 .tl-end-content{flex:1;padding-left:12px;padding-top:3px}
-.tl-end-label{font-size:10px;letter-spacing:3px;color:var(--gold-dim);text-transform:uppercase;font-weight:300}
+.tl-end-label{font-family:var(--font-display);font-size:9px;letter-spacing:4px;color:var(--accent-dim);text-transform:uppercase}
 
-/* add next row */
-.add-next-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)}
-.break-input{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:14px;color:var(--cream);font-family:'Jost',sans-serif;width:80px;transition:border-color .2s}
-.break-input:focus{outline:none;border-color:var(--plan-dim)}
-.break-input:hover{border-color:var(--border)}
-.add-note{font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6}
-
-/* summary bar */
-.summary-bar{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 16px;margin-top:1.25rem;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+.summary-bar{background:var(--bg-dark);border:1px solid var(--border);border-radius:2px;padding:12px 16px;margin-top:1.25rem;display:flex;gap:16px;flex-wrap:wrap;align-items:center}
 .summary-item{display:flex;flex-direction:column;gap:2px}
-.summary-label{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);font-weight:300}
-.summary-val{font-size:16px;font-weight:500;color:var(--cream);font-family:'Cormorant Garamond',serif}
-.summary-val span{font-size:11px;color:var(--muted);font-family:'Jost',sans-serif;font-weight:300;margin-left:2px}
-.summary-divider{width:1px;height:36px;background:var(--border)}
+.summary-label{font-family:var(--font-display);font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--text-muted)}
+.summary-val{font-family:var(--font-display);font-size:1.5rem;color:var(--summary-val);letter-spacing:1px}
+.theme-hollywood .summary-val{font-weight:700}
+.summary-val small{font-size:11px;color:var(--text-muted);font-family:var(--font-body);margin-left:2px}
+.summary-div{width:1px;height:36px;background:var(--border)}
 
-/* film strip */
-.film-strip{display:flex;justify-content:center;gap:6px;padding:1rem;background:var(--dark);border-top:1px solid var(--border)}
-.fh{width:16px;height:10px;border:1px solid var(--border);border-radius:2px;opacity:.3}
+.add-next-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+.add-note{font-size:10px;color:var(--text-muted);margin-top:8px;line-height:1.6;font-family:var(--font-mono)}
+.theme-hollywood .add-note{font-style:italic}
 
+/* Film footer */
+.film-footer{display:flex;justify-content:center;gap:4px;padding:.75rem 1.5rem;border-top:1px solid var(--border)}
+.fh{width:15px;height:10px;border:1px solid var(--border);border-radius:2px;opacity:.25}
+
+/* ══════════════════════════════════════════
+   GRINDHOUSE NEON EFFECTS
+══════════════════════════════════════════ */
+
+/* ── Neon keyframes ── */
+@keyframes neon-flicker{
+  0%,19%,21%,23%,25%,54%,56%,100%{
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px #ffe080,
+      0 0 18px #e8152a,
+      0 0 38px #e8152a,
+      0 0 60px #e8152a,
+      0 0 80px #e8152a;
+    opacity:1;
+  }
+  20%,24%,55%{
+    text-shadow:none;
+    opacity:.6;
+  }
+}
+
+@keyframes neon-flicker-soft{
+  0%,18%,20%,100%{
+    text-shadow:
+      0 0 4px #fff,
+      0 0 10px #ffe080,
+      0 0 18px #e8152a,
+      0 0 38px #e8152a,
+      0 0 60px #e8152a;
+    opacity:1;
+  }
+  19%{
+    text-shadow:0 0 2px #e8152a;
+    opacity:.7;
+  }
+}
+
+@keyframes glitch-text{
+  0%,100%{
+    text-shadow:
+      3px 3px 0 #e8152a,
+      -2px -2px 0 #00e5ff,
+      0 0 20px rgba(232,21,42,.4);
+    transform:translate(0,0);
+  }
+  10%{
+    text-shadow:
+      -3px 3px 0 #e8152a,
+      3px -2px 0 #00e5ff,
+      0 0 30px rgba(232,21,42,.6);
+    transform:translate(1px,-1px);
+  }
+  20%{
+    text-shadow:
+      3px -3px 0 #e8152a,
+      -2px 2px 0 #00e5ff;
+    transform:translate(-1px,1px);
+  }
+  30%{
+    text-shadow:
+      3px 3px 0 #e8152a,
+      -2px -2px 0 #00e5ff,
+      0 0 20px rgba(232,21,42,.4);
+    transform:translate(0,0);
+  }
+}
+
+@keyframes neon-border-pulse{
+  0%,100%{box-shadow:0 0 5px #e8152a,0 0 15px #e8152a,0 0 30px rgba(232,21,42,.3),inset 0 0 5px rgba(232,21,42,.1)}
+  50%{box-shadow:0 0 8px #e8152a,0 0 25px #e8152a,0 0 50px rgba(232,21,42,.5),inset 0 0 10px rgba(232,21,42,.2)}
+}
+
+@keyframes neon-ticket-pulse{
+  0%,100%{
+    border-color:#c8a020;
+    box-shadow:0 0 5px #c8a020,0 0 15px #c8a020,0 0 30px rgba(200,160,32,.35),inset 0 0 5px rgba(200,160,32,.1);
+  }
+  50%{
+    border-color:#ffcc00;
+    box-shadow:0 0 8px #ffcc00,0 0 25px #ffcc00,0 0 50px rgba(255,204,0,.45),inset 0 0 10px rgba(255,204,0,.15);
+  }
+}
+
+@keyframes neon-frame-cycle{
+  0%,32%{border-color:#e8152a;box-shadow:0 0 6px #e8152a,0 0 14px rgba(232,21,42,.4)}
+  33%,65%{border-color:#ffcc00;box-shadow:0 0 6px #ffcc00,0 0 14px rgba(255,204,0,.4)}
+  66%,100%{border-color:#00e5ff;box-shadow:0 0 6px #00e5ff,0 0 14px rgba(0,229,255,.4)}
+}
+
+@keyframes btn-neon-hover{
+  0%,100%{box-shadow:0 0 5px #e8152a,0 0 15px rgba(232,21,42,.3)}
+  50%{box-shadow:0 0 8px #e8152a,0 0 25px rgba(232,21,42,.5)}
+}
+
+/* ── 1. タイトルネオンフリッカー ── */
+.theme-grindhouse .header-title{
+  animation:neon-flicker 4s infinite alternate;
+}
+
+/* ── 2. 選択中チケットのネオングロー（黄色） ── */
+.theme-grindhouse .ticket.active{
+  border-color:#c8a020 !important;
+  animation:neon-ticket-pulse 2s ease-in-out infinite;
+}
+.theme-grindhouse .ticket.active .ticket-name{
+  text-shadow:0 0 8px #ffcc00,0 0 16px rgba(255,204,0,.5);
+}
+
+/* ── 3. フィルムフレームのネオン枠（3色ループ） ── */
+.theme-grindhouse .film-frame:hover{
+  animation:neon-frame-cycle 1.2s linear infinite;
+  transform:scale(1.05);
+}
+
+/* 非ホバー時もほんのり発光 */
+.theme-grindhouse .film-frame{
+  border-color:#1e1e1e;
+  transition:all .18s;
+}
+
+/* ── 4. モーダルタイトル（静的・アニメなし） ── */
+
+/* ── 5. ボタンホバー時のネオングロー ── */
+.theme-grindhouse .btn-primary:hover{
+  border-color:#e8152a !important;
+  color:#ff4d5e !important;
+  animation:btn-neon-hover 1s ease-in-out infinite;
+  text-shadow:0 0 8px rgba(232,21,42,.8);
+}
+.theme-grindhouse .btn-green:hover{
+  border-color:#5ec490 !important;
+  box-shadow:0 0 8px rgba(94,196,144,.4),0 0 20px rgba(94,196,144,.2) !important;
+  text-shadow:0 0 8px rgba(94,196,144,.6);
+}
+.theme-grindhouse .btn-secondary:hover{
+  border-color:#aaa !important;
+  box-shadow:0 0 8px rgba(170,170,170,.3) !important;
+  text-shadow:0 0 6px rgba(200,200,200,.5);
+}
+
+/* ── 6. 上映時間の数字を黄色ネオン ── */
+.theme-grindhouse .modal-runtime strong{
+  color:#ffcc00;
+  text-shadow:0 0 6px #ffcc00,0 0 14px rgba(255,204,0,.5);
+  font-size:13px;
+}
+.theme-grindhouse .tl-time{
+  color:#ffcc00;
+  text-shadow:0 0 6px #ffcc00,0 0 12px rgba(255,204,0,.4);
+}
+.theme-grindhouse .tl-end-time{
+  color:#ffcc00;
+  text-shadow:0 0 8px #ffcc00,0 0 16px rgba(255,204,0,.5);
+}
+.theme-grindhouse .summary-val{
+  text-shadow:0 0 6px rgba(240,240,240,.3);
+}
+
+/* ── サブタイトル（映画ガチャ & スケジューラー）ネオン ── */
+.theme-grindhouse .header-title-sub{
+  text-shadow:0 0 8px #ffcc00,0 0 18px rgba(255,204,0,.4);
+  animation:neon-flicker-soft 6s infinite alternate;
+}
+
+/* ── NOW PLAYINGバナーのネオン ── */
+.theme-grindhouse .modal-now-playing{
+  text-shadow:0 0 8px rgba(232,21,42,.7),0 0 16px rgba(232,21,42,.3);
+  animation:neon-flicker-soft 3s infinite alternate;
+}
+
+/* ── ヘッダーテープのネオングロー強化 ── */
+.theme-grindhouse .header-tape{
+  box-shadow:0 0 10px rgba(232,21,42,.6),0 0 30px rgba(232,21,42,.3),inset 0 0 10px rgba(255,255,255,.05);
+  text-shadow:0 0 8px rgba(255,255,255,.8);
+  animation:neon-border-pulse 3s ease-in-out infinite;
+}
+
+/* ── モーダルトップライン強化 ── */
+.theme-grindhouse .modal::before{
+  box-shadow:0 0 15px rgba(232,21,42,.8),0 0 30px rgba(232,21,42,.4);
+}
+
+/* ── アクティブチケットタブのネオン（黄色） ── */
+.theme-grindhouse .ticket::after{
+  box-shadow:0 0 8px #ffcc00,0 0 16px rgba(255,204,0,.5);
+}
+
+/* Responsive */
 @media(max-width:500px){
-  .mood-grid{grid-template-columns:repeat(2,1fr)}
-  .hdr-title{font-size:1.8rem}
-  .start-row,.add-next-row{flex-direction:column;align-items:flex-start}
+  .ticket-row{flex-direction:column;align-items:center}
+  .ticket{max-width:100%}
+  .modal-body{padding:1.25rem}
+  .modal-footer{padding:10px 1.25rem}
+  .theme-switcher{padding:.75rem 1rem .25rem}
+  .theme-btn{padding:7px 16px;font-size:10px}
 }
 </style>
 </head>
-<body>
+<body class="theme-grindhouse" id="body">
 <div class="app">
 
-  <div class="hdr">
-    <div class="hdr-rule"></div>
-    <div class="hdr-eyebrow">Cinema Select</div>
-    <div class="hdr-title">映画ガチャ <em>&</em> スケジューラー</div>
-    <div class="hdr-sub">Your mood · Your movie · Your plan</div>
-    <div class="hdr-rule-bot"></div>
+  <!-- HEADER -->
+  <div class="header">
+    <!-- Hollywood ornament -->
+    <div class="header-ornament">
+      <div class="orn-line"></div>
+      <div class="orn-star">✦ ✦ ✦</div>
+      <div class="orn-line r"></div>
+    </div>
+    <!-- Grindhouse tape -->
+    <div class="header-tape">★ Now Playing ★ Feature Presentation ★ Cinema Select ★</div>
+    <div class="header-content">
+      <div class="header-eyebrow">A Pa-papapa Production Presents</div>
+      <div class="header-rating">Cinephile Only</div>
+      <div class="header-title">Cinema<br>Select</div>
+      <div class="header-title-sub">映画ガチャ & スケジューラー</div>
+      <div class="header-rule-box">
+        <div class="hrb-line"></div>
+        <div class="hrb-diamond"></div>
+        <div class="hrb-line r"></div>
+      </div>
+      <div class="header-rule"></div>
+      <div class="header-sub">Your mood · Your movie · Your plan</div>
+    </div>
   </div>
 
-  <div class="tabs">
-    <button class="tb at" id="t1" onclick="sw('main')">メインスクリーン</button>
-    <button class="tb" id="t2" onclick="sw('mini')">ミニシアター</button>
+  <!-- TICKET TABS -->
+  <div class="ticket-row">
+    <div class="ticket active" id="tk-main" onclick="switchTab('main')">
+      <div class="ticket-perf-top"></div>
+      <div class="ticket-inner">
+        <div class="ticket-stub"><div class="ticket-stub-text">Admit One</div></div>
+        <div class="ticket-body">
+          <div class="ticket-label">Main Screen</div>
+          <div class="ticket-name">メインスクリーン</div>
+          <div class="ticket-num">No.0001 — Major Films</div>
+        </div>
+      </div>
+      <div class="ticket-perf-bot"></div>
+    </div>
+    <div class="ticket" id="tk-mini" onclick="switchTab('mini')">
+      <div class="ticket-perf-top"></div>
+      <div class="ticket-inner">
+        <div class="ticket-stub"><div class="ticket-stub-text">Admit One</div></div>
+        <div class="ticket-body">
+          <div class="ticket-label">Mini Theatre</div>
+          <div class="ticket-name">ミニシアター</div>
+          <div class="ticket-num">No.0002 — Art House</div>
+        </div>
+      </div>
+      <div class="ticket-perf-bot"></div>
+    </div>
   </div>
 
   <!-- MAIN PANE -->
-  <div id="p1" class="pane vis">
-    <div class="mood-section">
-      <div class="mood-label">— 今の気分は？ —</div>
-      <div class="mood-grid" id="g1"></div>
-    </div>
-    <div class="result-wrap">
-      <div class="divider"></div>
-      <div id="r1">
-        <div class="empty-state">
-          <span class="empty-icon"><span class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 12h20M2 8h5M2 16h5M17 8h5M17 16h5"/></svg></span></span>
-          <div class="empty-text">気分ボタンを押して映画をガチャしよう</div>
-        </div>
+  <div id="p-main" class="pane vis">
+    <div class="filmroll-wrap">
+      <div class="filmroll">
+        <div class="filmroll-perf" id="pm-top"></div>
+        <div class="filmroll-track"><div class="filmroll-inner" id="film-main"></div></div>
+        <div class="filmroll-perf bot" id="pm-bot"></div>
       </div>
     </div>
-    <div class="plan-section" id="plan1"></div>
+    <div class="plan-section" id="plan-main"></div>
   </div>
 
   <!-- MINI PANE -->
-  <div id="p2" class="pane">
-    <div class="mood-section">
-      <div class="mood-label mini">— ミニシアターの世界へ —</div>
-      <div class="mood-grid" id="g2"></div>
-    </div>
-    <div class="result-wrap">
-      <div class="divider"></div>
-      <div id="r2">
-        <div class="empty-state">
-          <span class="empty-icon"><span class="ic"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/><rect x="9" y="10" width="2" height="2"/><rect x="13" y="10" width="2" height="2"/></svg></span></span>
-          <div class="empty-text">カテゴリを選んで出会いを待とう</div>
-        </div>
+  <div id="p-mini" class="pane">
+    <div class="filmroll-wrap">
+      <div class="filmroll">
+        <div class="filmroll-perf" id="pn-top"></div>
+        <div class="filmroll-track"><div class="filmroll-inner" id="film-mini"></div></div>
+        <div class="filmroll-perf bot" id="pn-bot"></div>
       </div>
     </div>
-    <div class="plan-section" id="plan2"></div>
+    <div class="plan-section" id="plan-mini"></div>
   </div>
 
-  <div class="film-strip">
-    <div class="fh"></div><div class="fh"></div><div class="fh"></div><div class="fh"></div>
-    <div class="fh"></div><div class="fh"></div><div class="fh"></div><div class="fh"></div>
+  <div class="film-footer">
+    <div class="fh"></div><div class="fh"></div><div class="fh"></div>
+    <div class="fh"></div><div class="fh"></div><div class="fh"></div>
+    <div class="fh"></div><div class="fh"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-corner tl"></div><div class="modal-corner tr"></div>
+    <div class="modal-corner bl"></div><div class="modal-corner br"></div>
+    <div class="modal-banner">
+      <span class="modal-now-playing" id="m-now">Now Showing</span>
+      <span class="modal-genre-badge" id="m-genre">—</span>
+    </div>
+    <div class="modal-body">
+      <div class="modal-title" id="m-title">—</div>
+      <div class="modal-title-jp" id="m-titleJp">—</div>
+      <div class="modal-meta">
+        <div class="modal-meta-item"><div class="modal-meta-dot"></div><span class="modal-meta-val" id="m-g2">—</span></div>
+        <div class="modal-meta-item"><div class="modal-meta-dot"></div><span class="modal-meta-val" id="m-dir">—</span></div>
+        <div class="modal-meta-item" id="m-orig-wrap"><div class="modal-meta-dot"></div><span class="modal-meta-val" id="m-orig">—</span></div>
+      </div>
+      <div class="modal-rule"></div>
+      <div class="modal-section-label">Synopsis</div>
+      <p class="modal-synopsis" id="m-syn">—</p>
+      <div class="modal-section-label">Highlight</div>
+      <div class="modal-highlight"><p class="modal-highlight-text" id="m-hi">—</p></div>
+    </div>
+    <div class="modal-footer">
+      <div class="modal-runtime">上映時間 <strong id="m-rt2">—</strong></div>
+      <div class="modal-btns">
+        <button class="btn btn-primary" onclick="openPlan()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>
+          鑑賞計画
+        </button>
+        <a class="btn btn-green" id="m-jw" href="#" target="_blank" rel="noopener">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 21h8M12 19v2"/></svg>
+          どこで見る？
+        </a>
+        <button class="btn btn-primary" onclick="reroll()">もう一度 ↺</button>
+        <button class="btn btn-secondary" onclick="closeModalDirect()">閉じる ✕</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-// ── DATA ──────────────────────────────────────────────
-const MM=[
-  {id:'cry',n:'泣きたい',d:'感動・ドラマ',i:'ti-droplet'},
-  {id:'laugh',n:'笑いたい',d:'コメディ・爽快',i:'ti-mood-happy'},
-  {id:'thrill',n:'ハラハラしたい',d:'サスペンス・アクション',i:'ti-bolt'},
-  {id:'relax',n:'頭を空っぽに',d:'癒し・ほのぼの',i:'ti-cloud'},
-  {id:'wonder',n:'異世界に行きたい',d:'ファンタジー・SF',i:'ti-planet'},
-  {id:'think',n:'じっくり考えたい',d:'社会派・哲学',i:'ti-brain'},
-];
-const MN=[
-  {id:'europe',n:'ヨーロッパ',d:'仏・伊・北欧ほか',i:'ti-building-arch'},
-  {id:'asia',n:'アジア',d:'台湾・韓国・イランほか',i:'ti-ripple'},
-  {id:'indie',n:'アメリカ インディーズ',d:'サンダンス系ほか',i:'ti-guitar-pick'},
-  {id:'quiet',n:'静かな映画',d:'台詞少なめ・余白の美',i:'ti-wind'},
-  {id:'mypick',n:'作者おすすめ',d:'とっておきの一本',i:'ti-heart'},
-];
-
-// runtime in minutes for calculations
 const DB={
   cry:[
     {t:'The Green Mile',j:'グリーンマイル',y:1999,r:'189分',min:189,dir:'フランク・ダラボン',g:'感動ドラマ',o:'',s:'死刑囚監房を舞台に、不思議な癒しの力を持つ大男ジョン・コーヒーと看守トムの友情を描く。スティーヴン・キング原作の名作。',h:'見どころ：マイケル・クラーク・ダンカンの圧倒的演技と、ラストの切なさは必ずあなたの涙腺を崩壊させる。'},
@@ -448,311 +1249,208 @@ const DB={
   ],
 };
 
-const ICONS = {
-  'ti-droplet': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C12 3 5 10.5 5 15a7 7 0 0 0 14 0c0-4.5-7-12-7-12z"/></svg>',
-  'ti-mood-happy': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="9" y1="10" x2="9.01" y2="10" stroke-width="2.5"/><line x1="15" y1="10" x2="15.01" y2="10" stroke-width="2.5"/><path d="M9.5 15a3.5 3.5 0 0 0 5 0"/></svg>',
-  'ti-bolt': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3l-6 10h5l-1 8 6-10h-5l1-8z"/></svg>',
-  'ti-cloud': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6.657 18C4.085 18 2 15.993 2 13.517c0-2.475 2.085-4.482 4.657-4.482.12 0 .24.005.358.014C7.76 7.337 9.77 6 12.08 6c3.069 0 5.56 2.374 5.56 5.302 0 .05 0 .1-.003.15C19.137 11.885 20 13.07 20 14.43 20 16.394 18.34 18 16.298 18H6.657z"/></svg>',
-  'ti-planet': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><path d="M2 12h20"/></svg>',
-  'ti-brain': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15.5 13a3.5 3.5 0 0 0-3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8"/><path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1-7 0v-1.8"/><path d="M17.5 12a2.5 2.5 0 0 0 0-5 2.5 2.5 0 0 0-4.5-1.5"/><path d="M6.5 12a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 4.5-1.5"/><path d="M12 8v4"/></svg>',
-  'ti-building-arch': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 20v-6a3 3 0 0 1 6 0v6"/></svg>',
-  'ti-ripple': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4"/><path d="M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>',
-  'ti-guitar-pick': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3C8 3 4 7 4 11c0 3.9 2.9 6 5 8l3 3 3-3c2.1-2 5-4.1 5-8 0-4-4-8-8-8z"/></svg>',
-  'ti-wind': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h8.5a2.5 2.5 0 1 0-2.34-3.24"/><path d="M3 12h15.5a2.5 2.5 0 1 1-2.34 3.24"/><path d="M4 16h5.5a2.5 2.5 0 1 0-2.34 3.24"/></svg>',
-  'ti-heart': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
-};
-function ic(id){return '<span class="ic">'+(ICONS[id]||'')+'</span>';}
-// ── STATE ─────────────────────────────────────────────
-const state = { main: { movie: null, schedule: [] }, mini: { movie: null, schedule: [] } };
+// ── HELPERS ──────────────────────────────────────────
+function fmtRuntime(min){
+  const h=Math.floor(min/60),m=min%60;
+  return h>0?`${min}分（${h}時間${m>0?m+'分':''}）`:`${min}分`;
+}
+function addMinutes(t,mins){
+  const[h,m]=t.split(':').map(Number);
+  const tot=h*60+m+mins;
+  return `${String(Math.floor(tot/60)%24).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`;
+}
+function totalMins(s){return s.reduce((a,i)=>a+(i.type==='movie'?i.movie.min:i.break),0)}
 
-// ── HELPERS ───────────────────────────────────────────
-function addMinutes(timeStr, mins) {
-  const [h, m] = timeStr.split(':').map(Number);
-  const total = h * 60 + m + mins;
-  const nh = Math.floor(total / 60) % 24;
-  const nm = total % 60;
-  return `${String(nh).padStart(2,'0')}:${String(nm).padStart(2,'0')}`;
-}
-function parseTime(timeStr) {
-  const [h, m] = timeStr.split(':').map(Number);
-  return h * 60 + m;
-}
-function totalMins(schedule) {
-  return schedule.reduce((a, item) => a + (item.type === 'movie' ? item.movie.min : item.break), 0);
-}
+// ── MOOD DATA ────────────────────────────────────────
+const MM=[
+  {id:'cry',n:'泣きたい',d:'感動・ドラマ',icon:'😢'},
+  {id:'laugh',n:'笑いたい',d:'コメディ・爽快',icon:'😄'},
+  {id:'thrill',n:'ハラハラしたい',d:'サスペンス・アクション',icon:'⚡'},
+  {id:'relax',n:'頭を空っぽに',d:'癒し・ほのぼの',icon:'☁️'},
+  {id:'wonder',n:'異世界に行きたい',d:'ファンタジー・SF',icon:'🪐'},
+  {id:'think',n:'じっくり考えたい',d:'社会派・哲学',icon:'🧠'},
+];
+const MN=[
+  {id:'europe',n:'ヨーロッパ',d:'仏・伊・北欧ほか',icon:'🏛'},
+  {id:'asia',n:'アジア',d:'台湾・韓国・イランほか',icon:'🌊'},
+  {id:'indie',n:'アメリカ インディーズ',d:'サンダンス系ほか',icon:'🎸'},
+  {id:'quiet',n:'静かな映画',d:'台詞少なめ・余白の美',icon:'🍃'},
+  {id:'mypick',n:'作者おすすめ',d:'とっておきの一本',icon:'❤️'},
+];
 
-// ── TABS ──────────────────────────────────────────────
-function sw(tab) {
-  document.getElementById('p1').classList.toggle('vis', tab==='main');
-  document.getElementById('p2').classList.toggle('vis', tab==='mini');
-  document.getElementById('t1').className = 'tb' + (tab==='main' ? ' at' : '');
-  document.getElementById('t2').className = 'tb' + (tab==='mini' ? ' atm' : '');
-}
+// ── STATE ────────────────────────────────────────────
+let currentTab='main';
+let currentMovie=null;
+let currentMoodId=null;
+let scheduleMain=[];
+let scheduleMini=[];
+let currentTheme='grindhouse';
 
-// ── RENDER MOODS ──────────────────────────────────────
-function renderAll() {
-  document.getElementById('g1').innerHTML = MM.map(m =>
-    `<button class="mb" onclick="pick('${m.id}','main',this)"><span class="mb-icon">${ic(m.i)}</span><span class="mb-name">${m.n}</span><span class="mb-desc">${m.d}</span></button>`
-  ).join('');
-  document.getElementById('g2').innerHTML = MN.map(m =>
-    `<button class="mb mm" onclick="pick('${m.id}','mini',this)"><span class="mb-icon">${ic(m.i)}</span><span class="mb-name">${m.n}</span><span class="mb-desc">${m.d}</span></button>`
-  ).join('');
+// ── THEME ────────────────────────────────────────────
+function setTheme(theme){
+  currentTheme=theme;
+  document.getElementById('body').className='theme-'+theme;
 }
 
-// ── PICK MOVIE ────────────────────────────────────────
-function pick(id, mode, btn) {
-  const gid = mode==='main' ? 'g1' : 'g2';
-  document.getElementById(gid).querySelectorAll('.mb').forEach(b => b.classList.remove('ac'));
-  btn.classList.add('ac');
-  const list = DB[id];
-  const movie = list[Math.floor(Math.random() * list.length)];
-  state[mode].movie = movie;
-  state[mode].schedule = [];
-  const isMini = mode === 'mini';
-  const mc = isMini ? 'mini' : '';
-  const url = 'https://www.justwatch.com/jp/search?q=' + encodeURIComponent(movie.t);
-  const rid = mode==='main' ? 'r1' : 'r2';
-  const pid = mode==='main' ? 'plan1' : 'plan2';
-
-  // close plan section
-  document.getElementById(pid).classList.remove('open');
-
-  document.getElementById(rid).innerHTML = `
-    <div class="movie-card" id="mc_${mode}">
-      <div class="card-banner">
-        <span class="now-showing ${mc}">${isMini ? 'Mini Theatre' : 'Now Showing'}</span>
-        <div class="badge-row">
-          <span class="genre-badge ${mc}">${movie.g}</span>
-          ${movie.o ? `<span class="origin-badge">${movie.o}</span>` : ''}
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="movie-title">${movie.t}</div>
-        <div class="movie-title-jp">${movie.j}（${movie.y}）</div>
-        <div class="meta-row">
-          <div class="meta-item"><div class="meta-dot ${mc}"></div><span class="meta-val">${movie.g}</span></div>
-          <div class="meta-item"><div class="meta-dot ${mc}"></div><span class="meta-val">${movie.r}</span></div>
-          ${movie.dir ? `<div class="meta-item"><div class="meta-dot ${mc}"></div><span class="meta-val">${movie.dir}</span></div>` : ''}
-          ${movie.o ? `<div class="meta-item"><div class="meta-dot ${mc}"></div><span class="meta-val">${movie.o}</span></div>` : ''}
-        </div>
-        <div class="section-label ${mc}">Synopsis</div>
-        <p class="synopsis">${movie.s}</p>
-        <div class="section-label ${mc}">Highlight</div>
-        <div class="highlight-box ${mc}"><p class="highlight-text">${movie.h}</p></div>
-      </div>
-      <div class="card-footer">
-        <div class="runtime">上映時間 <span class="${mc}">${movie.r}</span></div>
-        <div class="footer-btns">
-          <button class="btn btn-plan" onclick="openPlan('${mode}')">
-            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/><rect x="8" y="15" width="2" height="2"/></svg></span>鑑賞計画を立てる
-          </button>
-          <a class="btn btn-green" href="${url}" target="_blank" rel="noopener">
-            <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 21h8M12 19v2"/></svg></span>どこで見る？
-          </a>
-          <button class="btn btn-gold ${mc}" onclick="pick('${id}','${mode}',document.querySelector('#${gid} .mb.ac'))">もう一本 ↺</button>
-        </div>
-      </div>
-    </div>
-    <div class="jw-note">「どこで見る？」はJustWatch（外部サイト）に移動します。</div>
-  `;
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    const c = document.getElementById('mc_' + mode);
-    if (c) c.classList.add('show');
-  }));
+// ── INIT ─────────────────────────────────────────────
+function buildPerfs(id){
+  const el=document.getElementById(id);
+  if(el) el.innerHTML=Array(44).fill('<div class="perf-hole"></div>').join('');
+}
+function buildFilmRoll(id,moods,mode){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.innerHTML=[...moods,...moods].map(m=>`
+    <div class="film-frame" onclick="pickMood('${m.id}','${mode}')">
+      <span class="film-icon">${m.icon}</span>
+      <div class="film-label">${m.n}</div>
+      <div class="film-sublabel">${m.d}</div>
+    </div>`).join('');
+}
+function init(){
+  buildPerfs('pm-top');buildPerfs('pm-bot');
+  buildPerfs('pn-top');buildPerfs('pn-bot');
+  buildFilmRoll('film-main',MM,'main');
+  buildFilmRoll('film-mini',MN,'mini');
+  setTheme('grindhouse');
 }
 
-// ── OPEN PLAN ─────────────────────────────────────────
-function openPlan(mode) {
-  const movie = state[mode].movie;
-  if (!movie) return;
-  state[mode].schedule = [];
-  const pid = mode==='main' ? 'plan1' : 'plan2';
-  const el = document.getElementById(pid);
-  el.innerHTML = renderPlanShell(mode, movie);
+// ── TABS ─────────────────────────────────────────────
+function switchTab(tab){
+  currentTab=tab;
+  document.getElementById('p-main').classList.toggle('vis',tab==='main');
+  document.getElementById('p-mini').classList.toggle('vis',tab==='mini');
+  document.getElementById('tk-main').classList.toggle('active',tab==='main');
+  document.getElementById('tk-mini').classList.toggle('active',tab==='mini');
+  setTheme(tab==='main'?'grindhouse':'hollywood');
+}
+
+// ── PICK MOOD ────────────────────────────────────────
+function pickMood(id,mode){
+  currentMoodId=id;currentTab=mode;
+  const list=DB[id];
+  currentMovie=list[Math.floor(Math.random()*list.length)];
+  if(mode==='main')scheduleMain=[];else scheduleMini=[];
+  showModal(currentMovie);
+}
+
+// ── MODAL ────────────────────────────────────────────
+function showModal(m){
+  document.getElementById('m-title').textContent=`${m.t}（${m.y}）`;
+  document.getElementById('m-titleJp').textContent=m.j;
+  document.getElementById('m-genre').textContent=m.g;
+  document.getElementById('m-g2').textContent=m.g;
+  const rt=fmtRuntime(m.min);
+  document.getElementById('m-rt2').textContent=rt;
+  document.getElementById('m-dir').textContent=m.dir||'—';
+  document.getElementById('m-syn').textContent=m.s;
+  document.getElementById('m-hi').textContent=m.h;
+  document.getElementById('m-jw').href='https://www.justwatch.com/jp/search?q='+encodeURIComponent(m.t);
+  const ow=document.getElementById('m-orig-wrap');
+  document.getElementById('m-orig').textContent=m.o;
+  ow.style.display=m.o?'flex':'none';
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect()}
+function closeModalDirect(){
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function reroll(){
+  if(!currentMoodId)return;
+  const list=DB[currentMoodId];
+  currentMovie=list[Math.floor(Math.random()*list.length)];
+  showModal(currentMovie);
+}
+
+// ── PLAN ─────────────────────────────────────────────
+function openPlan(){
+  closeModalDirect();
+  const pid='plan-'+currentTab;
+  const el=document.getElementById(pid);
+  if(!el)return;
+  if(currentTab==='main')scheduleMain=[];else scheduleMini=[];
+  el.innerHTML=planShell(currentTab,currentMovie);
   el.classList.add('open');
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
 }
-
-function renderPlanShell(mode, movie) {
+function planShell(mode,m){
   return `
     <div class="plan-header">
-      <div class="plan-header-icon"><span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/><rect x="8" y="15" width="2" height="2"/></svg></span></div>
-      <div class="plan-header-text">
+      <div class="plan-header-icon">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>
+      </div>
+      <div>
         <div class="plan-title">鑑賞スケジューラー</div>
-        <div class="plan-sub">上映時間をもとに自動でタイムラインを計算します</div>
+        <div class="plan-sub">Screening Planner</div>
       </div>
     </div>
-    <div class="plan-movie-name">
-      <span class="ic"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 12h20M2 8h5M2 16h5M17 8h5M17 16h5"/></svg></span>
-      ${movie.t} — ${movie.r}
+    <div class="plan-movie-tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M7 4v16M17 4v16M2 12h20"/></svg>
+      ${m.t} — ${fmtRuntime(m.min)}
     </div>
     <div class="start-row">
       <div class="input-group">
         <div class="input-label">1本目の開始時間</div>
-        <input class="time-input" type="time" id="startTime_${mode}" value="13:00">
+        <input class="time-input" type="time" id="st_${mode}" value="13:00">
       </div>
-      <button class="btn btn-plan" onclick="buildTimeline('${mode}')">
-        <span class="ic"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l12 8-12 8V4z"/></svg></span>タイムラインを作成
+      <button class="btn btn-primary" onclick="buildTL('${mode}')">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 4l12 8-12 8V4z"/></svg>
+        タイムライン作成
       </button>
     </div>
-    <div id="timeline_${mode}"></div>
-  `;
+    <div id="tl_${mode}"></div>`;
 }
-
-// ── BUILD TIMELINE ────────────────────────────────────
-function buildTimeline(mode) {
-  const movie = state[mode].movie;
-  const startInput = document.getElementById('startTime_' + mode);
-  if (!startInput) return;
-  const startTime = startInput.value || '13:00';
-  state[mode].schedule = [{ type: 'movie', movie, startTime, endTime: addMinutes(startTime, movie.min) }];
-  renderTimeline(mode);
+function buildTL(mode){
+  const si=document.getElementById('st_'+mode);
+  const st=si?si.value:'13:00';
+  const s=[{type:'movie',movie:currentMovie,startTime:st,endTime:addMinutes(st,currentMovie.min)}];
+  if(mode==='main')scheduleMain=s;else scheduleMini=s;
+  renderTL(mode);
 }
-
-function addNextMovie(mode) {
-  const breakInput = document.getElementById('breakMin_' + mode);
-  const breakMins = parseInt(breakInput ? breakInput.value : '0') || 0;
-  const last = state[mode].schedule[state[mode].schedule.length - 1];
-  const breakStart = last.endTime;
-  const nextStart = addMinutes(breakStart, breakMins);
-
-  // pick a random movie different from current last
-  const allMovies = Object.values(DB).flat();
-  const filtered = allMovies.filter(m => m.t !== last.movie.t);
-  const next = filtered[Math.floor(Math.random() * filtered.length)];
-
-  if (breakMins > 0) {
-    state[mode].schedule.push({ type: 'break', break: breakMins, startTime: breakStart, endTime: nextStart });
-  }
-  state[mode].schedule.push({ type: 'movie', movie: next, startTime: nextStart, endTime: addMinutes(nextStart, next.min) });
-  renderTimeline(mode);
+function addNext(mode){
+  const bi=document.getElementById('bm_'+mode);
+  const bm=parseInt(bi?bi.value:'0')||0;
+  const sch=mode==='main'?scheduleMain:scheduleMini;
+  const last=sch[sch.length-1];
+  const bs=last.endTime,ns=addMinutes(bs,bm);
+  const all=Object.values(DB).flat();
+  const next=all.filter(m=>m.t!==last.movie.t)[Math.floor(Math.random()*(all.length-1))];
+  if(bm>0)sch.push({type:'break',break:bm,startTime:bs,endTime:ns});
+  sch.push({type:'movie',movie:next,startTime:ns,endTime:addMinutes(ns,next.min)});
+  if(mode==='main')scheduleMain=sch;else scheduleMini=sch;
+  renderTL(mode);
 }
-
-function renderTimeline(mode) {
-  const schedule = state[mode].schedule;
-  if (!schedule.length) return;
-  const tid = 'timeline_' + mode;
-  const el = document.getElementById(tid);
-  if (!el) return;
-
-  const totalMin = totalMins(schedule);
-  const movieCount = schedule.filter(s => s.type === 'movie').length;
-  const endTime = schedule[schedule.length - 1].endTime;
-  const maxMin = Math.max(...schedule.filter(s => s.type === 'movie').map(s => s.movie.min));
-
-  let html = `<div class="timeline">`;
-  let movieIdx = 0;
-  schedule.forEach((item, i) => {
-    if (item.type === 'movie') {
-      movieIdx++;
-      const barW = Math.round((item.movie.min / maxMin) * 100);
-      html += `
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-time">${item.startTime}</div>
-            <div class="tl-dot"></div>
-            <div class="tl-line"></div>
-          </div>
-          <div class="tl-content">
-            <div class="tl-card">
-              <div class="tl-card-head">
-                <span class="tl-card-num">${movieIdx}本目</span>
-                <span class="tl-card-genre">${item.movie.g}</span>
-              </div>
-              <div class="tl-card-body">
-                <div class="tl-movie-title">${item.movie.t}</div>
-                <div class="tl-movie-jp">${item.movie.j}（${item.movie.y}）</div>
-                <div class="tl-duration-bar"><div class="tl-duration-fill" style="width:${barW}%"></div></div>
-                <div class="tl-time-range">
-                  <span class="tl-time-val">${item.startTime}</span>
-                  <span class="tl-arrow">→</span>
-                  <span class="tl-time-val">${item.endTime}</span>
-                  <span style="margin-left:4px;font-size:10px;color:var(--muted)">${item.movie.r}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>`;
-    } else {
-      html += `
-        <div class="tl-item">
-          <div class="tl-left">
-            <div class="tl-time">${item.startTime}</div>
-            <div class="tl-dot" style="border-color:var(--muted)"></div>
-            <div class="tl-line" style="background:var(--border)"></div>
-          </div>
-          <div class="tl-content">
-            <div class="tl-break">
-              <span class="ic"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14c0 2.8 2.2 5 5 5h4c2.8 0 5-2.2 5-5V8H3v6z"/><path d="M17 9h1a3 3 0 0 1 0 6h-1"/></svg></span>
-              <span class="tl-break-text">移動・休憩 <span class="tl-break-min">${item.break}分</span>（${item.startTime} → ${item.endTime}）</span>
-            </div>
-          </div>
-        </div>`;
+function renderTL(mode){
+  const sch=mode==='main'?scheduleMain:scheduleMini;
+  if(!sch.length)return;
+  const el=document.getElementById('tl_'+mode);if(!el)return;
+  const tm=totalMins(sch),mc=sch.filter(s=>s.type==='movie').length;
+  const et=sch[sch.length-1].endTime;
+  const mx=Math.max(...sch.filter(s=>s.type==='movie').map(s=>s.movie.min));
+  let h='<div class="timeline">',i=0;
+  sch.forEach(item=>{
+    if(item.type==='movie'){
+      i++;const bw=Math.round((item.movie.min/mx)*100);
+      h+=`<div class="tl-item"><div class="tl-left"><div class="tl-time">${item.startTime}</div><div class="tl-dot"></div><div class="tl-line"></div></div><div class="tl-content"><div class="tl-card"><div class="tl-card-head"><span class="tl-card-num">${i}本目</span><span class="tl-card-genre">${item.movie.g}</span></div><div class="tl-card-body"><div class="tl-movie-title">${item.movie.t}</div><div class="tl-movie-jp">${item.movie.j}（${item.movie.y}）</div><div class="tl-duration-bar"><div class="tl-duration-fill" style="width:${bw}%"></div></div><div class="tl-time-range"><span class="tl-time-val">${item.startTime}</span><span style="color:var(--text-muted);font-size:10px">→</span><span class="tl-time-val">${item.endTime}</span><span style="font-size:10px;color:var(--text-muted);margin-left:4px">${fmtRuntime(item.movie.min)}</span></div></div></div></div></div>`;
+    }else{
+      h+=`<div class="tl-item"><div class="tl-left"><div class="tl-time">${item.startTime}</div><div class="tl-dot" style="border-color:var(--text-muted)"></div><div class="tl-line" style="background:var(--border)"></div></div><div class="tl-content"><div class="tl-break"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--text-muted)"><path d="M3 14c0 2.8 2.2 5 5 5h4c2.8 0 5-2.2 5-5V8H3v6z"/><path d="M17 9h1a3 3 0 0 1 0 6h-1"/></svg><span class="tl-break-text">移動・休憩 <span class="tl-break-min">${item.break}分</span>（${item.startTime} → ${item.endTime}）</span></div></div></div>`;
     }
   });
-
-  // end node
-  html += `
-    <div class="tl-end">
-      <div class="tl-end-left">
-        <div class="tl-end-time">${endTime}</div>
-        <div class="tl-end-dot"></div>
-      </div>
-      <div class="tl-end-content">
-        <div class="tl-end-label">終了</div>
-      </div>
-    </div>
-  </div>`;
-
-  // summary
-  const totalH = Math.floor(totalMin / 60);
-  const totalM = totalMin % 60;
-  html += `
-    <div class="summary-bar">
-      <div class="summary-item">
-        <div class="summary-label">鑑賞本数</div>
-        <div class="summary-val">${movieCount}<span>本</span></div>
-      </div>
-      <div class="summary-divider"></div>
-      <div class="summary-item">
-        <div class="summary-label">合計時間</div>
-        <div class="summary-val">${totalH > 0 ? totalH + '<span>時間</span>' : ''}${totalM}<span>分</span></div>
-      </div>
-      <div class="summary-divider"></div>
-      <div class="summary-item">
-        <div class="summary-label">終了時刻</div>
-        <div class="summary-val">${endTime}</div>
-      </div>
-    </div>`;
-
-  // add next row
-  html += `
-    <div class="add-next-row">
-      <div class="input-group">
-        <div class="input-label">移動・休憩時間（分）</div>
-        <input class="break-input" type="number" id="breakMin_${mode}" min="0" max="300" value="30" placeholder="30">
-      </div>
-      <button class="btn btn-plan" onclick="addNextMovie('${mode}')">
-        <span class="ic"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg></span>2本目を追加
-      </button>
-    </div>
-    <div class="add-note">※ランダムな映画が追加されます。特定の映画を選ぶには、上のガチャで引き直してください。</div>
-  `;
-
-  el.innerHTML = html;
-
-  // animate bars
-  requestAnimationFrame(() => requestAnimationFrame(() => {
-    el.querySelectorAll('.tl-duration-fill').forEach(b => {
-      const w = b.style.width;
-      b.style.width = '0';
-      setTimeout(() => { b.style.width = w; }, 100);
+  h+=`<div class="tl-end"><div class="tl-end-left"><div class="tl-end-time">${et}</div><div class="tl-end-dot"></div></div><div class="tl-end-content"><div class="tl-end-label">終了 / Fin</div></div></div></div>`;
+  const th=Math.floor(tm/60),tmi=tm%60;
+  h+=`<div class="summary-bar"><div class="summary-item"><div class="summary-label">鑑賞本数</div><div class="summary-val">${mc}<small>本</small></div></div><div class="summary-div"></div><div class="summary-item"><div class="summary-label">合計時間</div><div class="summary-val">${th>0?th+'<small>時間</small>':''}${tmi}<small>分</small></div></div><div class="summary-div"></div><div class="summary-item"><div class="summary-label">終了時刻</div><div class="summary-val">${et}</div></div></div>`;
+  h+=`<div class="add-next-row"><div class="input-group"><div class="input-label">移動・休憩（分）</div><input class="break-input" type="number" id="bm_${mode}" min="0" max="300" value="30"></div><button class="btn btn-primary" onclick="addNext('${mode}')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>次の映画を追加</button></div><div class="add-note">※ランダムな映画が追加されます。特定の映画はガチャで引いてください。</div>`;
+  el.innerHTML=h;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    el.querySelectorAll('.tl-duration-fill').forEach(b=>{
+      const w=b.style.width;b.style.width='0';setTimeout(()=>{b.style.width=w;},100);
     });
   }));
 }
 
-// ── INIT ──────────────────────────────────────────────
-renderAll();
+init();
 </script>
 </body>
 </html>
