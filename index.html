@@ -1755,18 +1755,22 @@ function saveFavs(){localStorage.setItem('cs_favs',JSON.stringify(favs));updateB
 
 function toggleFav(){
   if(!currentMovie)return;
-  const key=currentMovie.t+'_'+currentMovie.y;
   const idx=favs.findIndex(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
   const btn=document.getElementById('btn-star');
   if(idx>=0){
     favs.splice(idx,1);
-    btn.textContent='☆';
     btn.classList.remove('starred','burst');
+    const label=btn.querySelector('.btn-bookmark-label');
+    if(label) label.textContent='Bookmark';
+    const svg=btn.querySelector('svg');
+    if(svg) svg.setAttribute('fill','none');
   } else {
     favs.push({t:currentMovie.t,j:currentMovie.j,y:currentMovie.y,g:currentMovie.g,dir:currentMovie.dir,moodId:currentMoodId});
-    btn.textContent='★';
     btn.classList.add('starred');
-    // バースト＋パーティクル
+    const label=btn.querySelector('.btn-bookmark-label');
+    if(label) label.textContent='Bookmarked';
+    const svg=btn.querySelector('svg');
+    if(svg) svg.setAttribute('fill','currentColor');
     btn.classList.remove('burst');
     void btn.offsetWidth;
     btn.classList.add('burst');
