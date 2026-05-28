@@ -168,35 +168,62 @@ body.theme-hollywood::before{
    HEADER
 ══════════════════════════════════════════ */
 .header{
-  padding:2rem 1.5rem 1.5rem;
+  padding:0;
   position:relative;overflow:hidden;
   background:var(--header-bg);
-  min-height:230px;
+  min-height:460px;
+  display:flex;
+  flex-direction:column;
+}
+.header-content{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:1rem 1.5rem 1.5rem;
+  text-align:center;
+  position:relative;
+  z-index:1;
 }
 
 /* Hollywood header */
-.theme-hollywood .header-ornament{
+.header-ornament{
   display:flex;align-items:center;gap:12px;
-  justify-content:center;margin-bottom:1.25rem;
+  justify-content:center;margin-bottom:.75rem;
+  height:24px;
 }
+
 .theme-hollywood .orn-line{height:1px;width:60px;background:linear-gradient(90deg,transparent,var(--accent))}
 .theme-hollywood .orn-line.r{background:linear-gradient(90deg,var(--accent),transparent)}
 .theme-hollywood .orn-star{color:var(--accent);font-size:10px;letter-spacing:4px}
-.theme-grindhouse .header-ornament{display:none}
+
 
 .header-tape{
-  display:none;
+  height:26px;
+  display:flex;align-items:center;justify-content:center;
   background:var(--accent);
-  padding:3px 0;text-align:center;
+  text-align:center;
   font-family:'Bebas Neue',sans-serif;
   font-size:10px;letter-spacing:8px;
   color:rgba(255,255,255,.9);
-  margin-bottom:1.5rem;
+  margin-bottom:0;
   box-shadow:0 0 20px rgba(232,21,42,.4);
 }
-.theme-grindhouse .header-tape{display:block}
+.theme-hollywood .header-tape{
+  background:rgba(201,162,42,.6);
+  border-top:1px solid rgba(201,162,42,.3);
+  border-bottom:1px solid rgba(201,162,42,.3);
+  color:#0a0804;
+  font-family:'Cormorant Garamond',serif;
+  font-style:italic;
+  font-size:11px;
+  letter-spacing:5px;
+  box-shadow:none;
+}
+.theme-grindhouse .header-tape{visibility:visible}
 
-.header-content{text-align:center;position:relative;z-index:1}
+
 
 .header-eyebrow{
   font-size:9px;letter-spacing:7px;
@@ -215,6 +242,17 @@ body.theme-hollywood::before{
 }
 .theme-grindhouse .header-rating{display:inline-block}
 
+.header-title-svg{
+  width:100%;
+  max-width:780px;
+  margin:0 auto;
+  display:block;
+}
+.header-title-svg svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
 .header-title{
   font-family:var(--font-display);
   font-size:var(--title-size);
@@ -223,6 +261,17 @@ body.theme-hollywood::before{
   margin-bottom:.35rem;
   text-shadow:var(--title-shadow);
   transition:color .3s ease, text-shadow .3s ease, opacity .3s ease;
+}
+.theme-hollywood .header-title-svg{
+  width:100%;
+  max-width:780px;
+  margin:0 auto;
+  display:block;
+}
+.header-title-svg svg{
+  width:100%;
+  height:auto;
+  display:block;
 }
 .theme-hollywood .header-title{
   font-family:'Josefin Sans',sans-serif;
@@ -238,6 +287,8 @@ body.theme-hollywood::before{
     0 0 40px rgba(201,162,42,.12),
     0 0 80px rgba(201,162,42,.06);
 }
+.theme-hollywood .header-title{display:none}
+.theme-hollywood .header-title-sub{display:none}
 
 .header-title-sub{
   font-family:var(--font-display);
@@ -413,15 +464,13 @@ body.theme-hollywood::before{
   background:#0a0a0a;
 }
 .theme-hollywood .filmroll-perf{
-  background-color:#100a02;
+  background-color:#0e0c00;
 }
 .theme-grindhouse .filmroll-perf{
   background-color:#0e0c00;
 }
-.filmroll-perf.bot{border-top:1px solid var(--border)}
-.filmroll-perf:not(.bot){border-bottom:1px solid var(--border)}
-.theme-grindhouse .filmroll-perf.bot{border-top-color:#6b5510}
-.theme-grindhouse .filmroll-perf:not(.bot){border-bottom-color:#6b5510}
+.filmroll-perf.bot{border-top:1px solid #6b5510}
+.filmroll-perf:not(.bot){border-bottom:1px solid #6b5510}
 .perf-hole{
   width:17px;height:12px;border-radius:3px;
   background:#000;
@@ -429,7 +478,7 @@ body.theme-hollywood::before{
   box-shadow:inset 0 1px 3px rgba(0,0,0,.9);
 }
 .theme-hollywood .perf-hole{
-  box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1px rgba(201,146,42,.28);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1.5px rgba(154,122,20,.45);
 }
 .theme-grindhouse .perf-hole{
   box-shadow:inset 0 1px 3px rgba(0,0,0,.9),0 0 0 1.5px rgba(154,122,20,.45);
@@ -854,21 +903,33 @@ body.theme-hollywood::before{
 }
 
 /* ── 1. タイトルネオンフリッカー ── */
+.theme-grindhouse .header-title-svg{
+  display:none;
+}
+.header-title-svg svg{
+  width:100%;
+  height:auto;
+  display:block;
+}
 .theme-grindhouse .header-title{
   font-family:'Monoton',sans-serif;
-  font-size:clamp(3rem,9vw,6.5rem);
+  font-size:clamp(3.5rem,10vw,7.5rem);
   letter-spacing:2px;
-  color:#ff6680;
+  color:#f04060;
   animation:neon-flicker 4s infinite alternate;
   position:relative;
+  text-shadow:
+    0 0 8px rgba(255,80,100,.4),
+    0 0 20px rgba(232,21,42,.2),
+    0 0 50px rgba(232,21,42,.1);
 }
 .theme-grindhouse .header-title::before{
   content:attr(data-text);
   position:absolute;
   left:50%;transform:translateX(-50%);
   color:#e8152a;
-  opacity:.2;
-  filter:blur(4px);
+  opacity:.12;
+  filter:blur(6px);
   pointer-events:none;
   white-space:nowrap;
 }
@@ -877,8 +938,8 @@ body.theme-hollywood::before{
   position:absolute;
   left:50%;transform:translateX(-50%);
   color:#ff4466;
-  opacity:.15;
-  filter:blur(8px);
+  opacity:.08;
+  filter:blur(12px);
   pointer-events:none;
   white-space:nowrap;
 }
@@ -996,9 +1057,66 @@ body.theme-hollywood::before{
     <!-- Grindhouse tape -->
     <div class="header-tape">★ Now Playing ★ Feature Presentation ★ Cinema Select ★</div>
     <div class="header-content">
-      <div class="header-eyebrow">A Pa-papapa Production Presents</div>
       <div class="header-rating">For Everyone</div>
-      <div class="header-title" data-text="CINEMA SELECT">Cinema<br>Select</div>
+      <div class="header-title-svg" id="header-logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 310" role="img" style="width:100%;max-width:680px;display:block;margin:0 auto;">
+  <title>Cinema Select ロゴ</title>
+  <defs>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@700&display=swap');</style>
+    <pattern id="dp" x="0" y="0" width="12" height="12" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="6" r="3.2" fill="#F0C040"/>
+    </pattern>
+    <mask id="mCinema">
+      <text x="340" y="165" text-anchor="middle" font-family="'Oswald','Arial Black',sans-serif" font-weight="700" font-size="118px" letter-spacing="5" fill="white">CINEMA</text>
+    </mask>
+    <filter id="behindGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+    <filter id="behindGlowSm" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  </defs>
+
+  <rect width="680" height="310" fill="#140E06"/>
+  <rect x="14" y="12" width="652" height="286" fill="none" stroke="#3A2A0A" stroke-width="0.5" rx="2"/>
+  <rect x="20" y="18" width="640" height="274" fill="none" stroke="#1E1606" stroke-width="0.4"/>
+  <line x1="48" y1="50" x2="632" y2="50" stroke="#F0C040" stroke-width="0.8"/>
+  <line x1="48" y1="262" x2="632" y2="262" stroke="#F0C040" stroke-width="0.8"/>
+  <circle cx="52" cy="50" r="3" fill="none" stroke="#F0C040" stroke-width="0.8"/>
+  <circle cx="628" cy="50" r="3" fill="none" stroke="#F0C040" stroke-width="0.8"/>
+  <circle cx="52" cy="262" r="3" fill="none" stroke="#F0C040" stroke-width="0.8"/>
+  <circle cx="628" cy="262" r="3" fill="none" stroke="#F0C040" stroke-width="0.8"/>
+
+  <text x="340" y="165" text-anchor="middle" font-family="'Oswald','Arial Black',sans-serif" font-weight="700" font-size="118px" letter-spacing="5"
+    fill="none" stroke="#F0C040" stroke-width="18" opacity="0.18"
+    filter="url(#behindGlow)">CINEMA</text>
+
+  <rect x="0" y="55" width="680" height="165" fill="url(#dp)" mask="url(#mCinema)"/>
+
+  <text x="340" y="165" text-anchor="middle" font-family="'Oswald','Arial Black',sans-serif" font-weight="700" font-size="118px" letter-spacing="5"
+    fill="none" stroke="#FFE090" stroke-width="2.5" opacity="0.9">CINEMA</text>
+
+  <line x1="108" y1="184" x2="248" y2="184" stroke="#F0C040" stroke-width="0.7"/>
+  <circle cx="257" cy="184" r="2.2" fill="#F0C040"/>
+  <circle cx="266" cy="184" r="2.2" fill="#F0C040"/>
+  <circle cx="275" cy="184" r="2.2" fill="#F0C040"/>
+  <line x1="284" y1="184" x2="396" y2="184" stroke="#F0C040" stroke-width="0.7"/>
+  <circle cx="405" cy="184" r="2.2" fill="#F0C040"/>
+  <circle cx="414" cy="184" r="2.2" fill="#F0C040"/>
+  <circle cx="423" cy="184" r="2.2" fill="#F0C040"/>
+  <line x1="432" y1="184" x2="572" y2="184" stroke="#F0C040" stroke-width="0.7"/>
+
+  <text x="340" y="232" text-anchor="middle" font-family="'Oswald','Arial Black',sans-serif" font-weight="700" font-size="44px" letter-spacing="18"
+    fill="#F0C040" opacity="0.3"
+    filter="url(#behindGlowSm)">SELECT</text>
+
+  <text x="340" y="232" text-anchor="middle" font-family="'Oswald','Arial Black',sans-serif" font-weight="700" font-size="44px" letter-spacing="18"
+    fill="#F0C040">SELECT</text>
+
+  <text x="340" y="282" text-anchor="middle" font-family="'Oswald',sans-serif" font-size="10px" letter-spacing="4" fill="#6A5020">映画ガチャ  ✦  スケジューラー</text>
+</svg>
+      </div>
+      <div class="header-title" data-text="CINEMA SELECT">CINEMA<br>SELECT</div>
       <div class="header-title-sub">映画ガチャ & スケジューラー</div>
       <div class="header-rule-box">
         <div class="hrb-line"></div>
@@ -1351,8 +1469,7 @@ function init(){
   buildFilmRoll('film-mini',MN,'mini');
   setTheme('grindhouse');
   const titleEl=document.querySelector('.header-title');
-  titleEl.innerHTML='CINEMA<br>SELECT';
-  titleEl.setAttribute('data-text','CINEMA SELECT');
+  if(titleEl){titleEl.innerHTML='CINEMA<br>SELECT';titleEl.setAttribute('data-text','CINEMA SELECT');}
 }
 
 // ── TABS ─────────────────────────────────────────────
@@ -1364,13 +1481,16 @@ function switchTab(tab){
   document.getElementById('tk-mini').classList.toggle('active',tab==='mini');
   const isGrindhouse=tab==='main';
   setTheme(isGrindhouse?'grindhouse':'hollywood');
+  const tape=document.querySelector('.header-tape');
+  if(tape){
+    tape.textContent=isGrindhouse
+      ?'★ Now Playing ★ Feature Presentation ★ Cinema Select ★'
+      :'— Timeless Films — Cinema Select — Art House —';
+  }
   const titleEl=document.querySelector('.header-title');
-  if(isGrindhouse){
-    titleEl.innerHTML='CINEMA<br>SELECT';
-    titleEl.setAttribute('data-text','CINEMA SELECT');
-  } else {
-    titleEl.innerHTML='Cinema<br>Select';
-    titleEl.removeAttribute('data-text');
+  if(titleEl){
+    if(isGrindhouse){titleEl.innerHTML='CINEMA<br>SELECT';titleEl.setAttribute('data-text','CINEMA SELECT');}
+    else{titleEl.innerHTML='Cinema<br>Select';titleEl.removeAttribute('data-text');}
   }
 }
 
