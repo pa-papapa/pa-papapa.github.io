@@ -490,7 +490,7 @@ body.theme-hollywood::before{
   width:max-content;
 }
 .filmroll-inner:hover{animation-play-state:paused}
-@keyframes filmscroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes filmscroll{0%{transform:translateX(0)}100%{transform:translateX(-25%)}}
 
 .film-frame{
   flex-shrink:0;
@@ -1450,12 +1450,17 @@ function setTheme(theme){
 // ── INIT ─────────────────────────────────────────────
 function buildPerfs(id){
   const el=document.getElementById(id);
-  if(el) el.innerHTML=Array(44).fill('<div class="perf-hole"></div>').join('');
+  if(!el)return;
+  const count=Math.ceil(window.innerWidth/22)+4;
+  el.innerHTML=Array(count).fill('<div class="perf-hole"></div>').join('');
 }
+window.addEventListener('resize',()=>{
+  ['pm-top','pm-bot','pn-top','pn-bot'].forEach(buildPerfs);
+});
 function buildFilmRoll(id,moods,mode){
   const el=document.getElementById(id);
   if(!el)return;
-  el.innerHTML=[...moods,...moods].map(m=>`
+  el.innerHTML=[...moods,...moods,...moods,...moods].map(m=>`
     <div class="film-frame" onclick="pickMood('${m.id}','${mode}')">
       <span class="film-icon">${m.icon.startsWith('<svg') ? m.icon : m.icon}</span>
       <div class="film-label">${m.n}</div>
