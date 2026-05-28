@@ -1033,6 +1033,44 @@ body.theme-hollywood::before{
 }
 
 
+
+/* ══ BOOKMARK BUTTON ══ */
+.btn-bookmark{
+  display:inline-flex;align-items:center;gap:5px;
+  background:none;
+  border:1px solid var(--border);
+  border-radius:2px;
+  padding:5px 10px;
+  cursor:pointer;
+  color:var(--text-muted);
+  font-family:var(--font-mono);
+  font-size:10px;letter-spacing:2px;
+  white-space:nowrap;
+  flex-shrink:0;
+  margin-top:4px;
+  transition:all .2s;
+}
+.btn-bookmark:hover{
+  border-color:var(--accent);
+  color:var(--accent);
+}
+.btn-bookmark.starred{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#0a0804;
+}
+.theme-grindhouse .btn-bookmark.starred{
+  background:#ffcc00;
+  border-color:#ffcc00;
+  color:#050505;
+}
+@keyframes bookmarkPop{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.15)}
+  100%{transform:scale(1)}
+}
+.btn-bookmark.burst{animation:bookmarkPop .3s ease-out;}
+
 /* ══ FAVOURITE STAR ══ */
 .btn-star{
   background:none;border:none;cursor:pointer;
@@ -1310,8 +1348,16 @@ body.theme-hollywood::before{
       <span class="modal-genre-badge" id="m-genre">—</span>
     </div>
     <div class="modal-body">
-      <div class="modal-title" id="m-title">—</div>
-      <div class="modal-title-jp" id="m-titleJp">—</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div>
+          <div class="modal-title" id="m-title">—</div>
+          <div class="modal-title-jp" id="m-titleJp">—</div>
+        </div>
+        <button class="btn-bookmark" id="btn-star" onclick="toggleFav()" title="Bookmark">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span class="btn-bookmark-label">Bookmark</span>
+        </button>
+      </div>
       <div class="modal-meta">
         <div class="modal-meta-item"><div class="modal-meta-dot"></div><span class="modal-meta-val" id="m-g2">—</span></div>
         <div class="modal-meta-item"><div class="modal-meta-dot"></div><span class="modal-meta-val" id="m-dir">—</span></div>
@@ -1334,7 +1380,6 @@ body.theme-hollywood::before{
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 21h8M12 19v2"/></svg>
           どこで見る？
         </a>
-        <button class="btn-star" id="btn-star" onclick="toggleFav()" title="お気に入り">☆</button>
         <button class="btn btn-primary" onclick="reroll()">もう一度 ↺</button>
         <button class="btn btn-secondary" onclick="closeModalDirect()">閉じる ✕</button>
       </div>
@@ -1631,7 +1676,10 @@ function updateStarBtn(){
   const btn=document.getElementById('btn-star');
   if(!btn)return;
   const starred=favs.some(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
-  btn.textContent=starred?'★':'☆';
+  const label=btn.querySelector('.btn-bookmark-label');
+  if(label) label.textContent=starred?'Bookmarked':'Bookmark';
+  const svg=btn.querySelector('svg');
+  if(svg) svg.setAttribute('fill', starred?'currentColor':'none');
   btn.classList.toggle('starred',starred);
 }
 
