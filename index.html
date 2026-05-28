@@ -5,7 +5,7 @@
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cinema Select — 映画ガチャ＆スケジューラー</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Josefin+Sans:wght@300;400;600;700&family=Libre+Baskerville:ital,wght@0,400;1,400&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Josefin+Sans:wght@300;400;600;700&family=Libre+Baskerville:ital,wght@0,400;1,400&family=Monoton&family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,700;1,400&family=Special+Elite&display=swap" rel="stylesheet">
 <style>
 /* ══════════════════════════════════════════
    THEME VARIABLES
@@ -42,7 +42,7 @@
   --font-display:'Playfair Display',serif;
   --font-body:  'Josefin Sans',sans-serif;
   --font-mono:  'Libre Baskerville',serif;
-  --title-size: clamp(2.4rem,7vw,4rem);
+  --title-size: clamp(3rem,8vw,5.5rem);
   --title-shadow: 0 2px 20px rgba(201,146,42,.25);
   --header-bg: linear-gradient(180deg,#1a0e04 0%,transparent 100%);
   --scanlines: none;
@@ -77,7 +77,7 @@
   --font-display:'Bebas Neue',sans-serif;
   --font-body:  'Barlow Condensed',sans-serif;
   --font-mono:  'Special Elite',serif;
-  --title-size: clamp(3rem,10vw,6rem);
+  --title-size: clamp(3rem,8vw,5.5rem);
   --title-shadow: 3px 3px 0 #e8152a,-1px -1px 0 #00e5ff,0 0 30px rgba(232,21,42,.3);
   --header-bg: linear-gradient(180deg,#0a0000 0%,transparent 100%);
   --scanlines: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.15) 2px,rgba(0,0,0,.15) 4px);
@@ -171,6 +171,7 @@ body.theme-hollywood::before{
   padding:2rem 1.5rem 1.5rem;
   position:relative;overflow:hidden;
   background:var(--header-bg);
+  min-height:230px;
 }
 
 /* Hollywood header */
@@ -221,16 +222,24 @@ body.theme-hollywood::before{
   line-height:.88;letter-spacing:3px;
   margin-bottom:.35rem;
   text-shadow:var(--title-shadow);
-  transition:all .4s ease;
+  transition:color .3s ease, text-shadow .3s ease, opacity .3s ease;
 }
-.theme-hollywood .header-title{font-weight:900;letter-spacing:2px}
+.theme-hollywood .header-title{
+  font-family:'Josefin Sans',sans-serif;
+  font-weight:700;
+  letter-spacing:6px;
+  color:transparent;
+  -webkit-text-stroke:1.2px #c9a23a;
+  paint-order:stroke fill;
+  font-size:clamp(3.5rem,9vw,6.5rem);
+}
 
 .header-title-sub{
   font-family:var(--font-display);
   font-size:clamp(.9rem,2.5vw,1.3rem);
   color:var(--accent);
   margin-bottom:.75rem;
-  transition:all .4s ease;
+  transition:color .3s ease, opacity .3s ease;
 }
 .theme-hollywood .header-title-sub{font-style:italic;font-weight:400}
 .theme-grindhouse .header-title-sub{font-family:'Bebas Neue',sans-serif;letter-spacing:5px;color:var(--accent2)}
@@ -753,16 +762,16 @@ body.theme-hollywood::before{
   0%,19%,21%,23%,25%,54%,56%,100%{
     text-shadow:
       0 0 4px #fff,
-      0 0 10px #ffe080,
-      0 0 18px #e8152a,
-      0 0 38px #e8152a,
-      0 0 60px #e8152a,
-      0 0 80px #e8152a;
+      0 0 8px #ffaaaa,
+      0 0 16px #ff4466,
+      0 0 32px #e8152a,
+      0 0 56px #e8152a,
+      0 0 80px rgba(232,21,42,.4);
     opacity:1;
   }
   20%,24%,55%{
-    text-shadow:none;
-    opacity:.6;
+    text-shadow:0 0 4px #ff4466;
+    opacity:.65;
   }
 }
 
@@ -841,7 +850,32 @@ body.theme-hollywood::before{
 
 /* ── 1. タイトルネオンフリッカー ── */
 .theme-grindhouse .header-title{
+  font-family:'Monoton',sans-serif;
+  font-size:clamp(3rem,9vw,6.5rem);
+  letter-spacing:2px;
+  color:#ff6680;
   animation:neon-flicker 4s infinite alternate;
+  position:relative;
+}
+.theme-grindhouse .header-title::before{
+  content:attr(data-text);
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  color:#e8152a;
+  opacity:.2;
+  filter:blur(4px);
+  pointer-events:none;
+  white-space:nowrap;
+}
+.theme-grindhouse .header-title::after{
+  content:attr(data-text);
+  position:absolute;
+  left:50%;transform:translateX(-50%);
+  color:#ff4466;
+  opacity:.15;
+  filter:blur(8px);
+  pointer-events:none;
+  white-space:nowrap;
 }
 
 /* ── 2. 選択中チケットのネオングロー（黄色） ── */
@@ -958,8 +992,8 @@ body.theme-hollywood::before{
     <div class="header-tape">★ Now Playing ★ Feature Presentation ★ Cinema Select ★</div>
     <div class="header-content">
       <div class="header-eyebrow">A Pa-papapa Production Presents</div>
-      <div class="header-rating">Cinephile Only</div>
-      <div class="header-title">Cinema<br>Select</div>
+      <div class="header-rating">For Everyone</div>
+      <div class="header-title" data-text="CINEMA SELECT">Cinema<br>Select</div>
       <div class="header-title-sub">映画ガチャ & スケジューラー</div>
       <div class="header-rule-box">
         <div class="hrb-line"></div>
@@ -1311,6 +1345,9 @@ function init(){
   buildFilmRoll('film-main',MM,'main');
   buildFilmRoll('film-mini',MN,'mini');
   setTheme('grindhouse');
+  const titleEl=document.querySelector('.header-title');
+  titleEl.innerHTML='CINEMA<br>SELECT';
+  titleEl.setAttribute('data-text','CINEMA SELECT');
 }
 
 // ── TABS ─────────────────────────────────────────────
@@ -1320,7 +1357,16 @@ function switchTab(tab){
   document.getElementById('p-mini').classList.toggle('vis',tab==='mini');
   document.getElementById('tk-main').classList.toggle('active',tab==='main');
   document.getElementById('tk-mini').classList.toggle('active',tab==='mini');
-  setTheme(tab==='main'?'grindhouse':'hollywood');
+  const isGrindhouse=tab==='main';
+  setTheme(isGrindhouse?'grindhouse':'hollywood');
+  const titleEl=document.querySelector('.header-title');
+  if(isGrindhouse){
+    titleEl.innerHTML='CINEMA<br>SELECT';
+    titleEl.setAttribute('data-text','CINEMA SELECT');
+  } else {
+    titleEl.innerHTML='Cinema<br>Select';
+    titleEl.removeAttribute('data-text');
+  }
 }
 
 // ── PICK MOOD ────────────────────────────────────────
