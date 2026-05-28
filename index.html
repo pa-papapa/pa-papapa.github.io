@@ -1032,6 +1032,109 @@ body.theme-hollywood::before{
   box-shadow:0 0 8px #ffcc00,0 0 16px rgba(255,204,0,.5);
 }
 
+
+/* ══ FAVOURITE STAR ══ */
+.btn-star{
+  background:none;border:none;cursor:pointer;
+  font-size:22px;line-height:1;padding:4px 8px;
+  color:var(--text-muted);
+  transition:color .2s, transform .2s;
+  position:relative;
+}
+.btn-star.starred{color:#ffcc00;}
+.btn-star:hover{transform:scale(1.2);}
+
+@keyframes starBurst{
+  0%{transform:scale(1);opacity:1}
+  30%{transform:scale(1.6);opacity:1}
+  100%{transform:scale(1);opacity:1}
+}
+@keyframes sparkle{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0)}
+  50%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(1.5)}
+}
+.btn-star.burst{animation:starBurst .4s ease-out;}
+.star-particle{
+  position:absolute;pointer-events:none;
+  width:6px;height:6px;border-radius:50%;
+  background:#ffcc00;
+  animation:sparkle .5s ease-out forwards;
+}
+
+/* ══ FAVOURITES PANEL ══ */
+.fav-panel{
+  max-width:900px;margin:0 auto;
+  padding:1rem 1.5rem 2rem;
+  display:none;
+}
+.fav-panel.vis{display:block;}
+.fav-panel-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:.75rem;
+}
+.fav-panel-title{
+  font-family:var(--font-display);
+  font-size:1.1rem;letter-spacing:3px;
+  color:var(--accent);
+}
+.fav-panel-clear{
+  font-size:10px;letter-spacing:2px;
+  color:var(--text-muted);cursor:pointer;
+  background:none;border:none;
+  font-family:var(--font-mono);
+}
+.fav-panel-clear:hover{color:var(--accent);}
+.fav-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:.75rem;
+}
+.fav-item{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:3px;padding:.75rem 1rem;
+  cursor:pointer;
+  transition:border-color .2s, transform .2s;
+  position:relative;
+}
+.fav-item:hover{border-color:var(--border-hi);transform:translateY(-2px);}
+.fav-item-title{
+  font-family:var(--font-display);
+  font-size:1rem;color:var(--accent-light);
+  margin-bottom:.2rem;letter-spacing:1px;
+}
+.fav-item-sub{font-size:11px;color:var(--text-muted);}
+.fav-item-remove{
+  position:absolute;top:.5rem;right:.6rem;
+  background:none;border:none;cursor:pointer;
+  font-size:12px;color:var(--text-muted);
+}
+.fav-item-remove:hover{color:var(--accent);}
+.fav-empty{
+  font-family:var(--font-mono);
+  font-size:12px;color:var(--text-muted);
+  letter-spacing:2px;text-align:center;
+  padding:2rem;
+}
+.fav-tab{
+  display:inline-flex;align-items:center;gap:6px;
+  cursor:pointer;
+  font-family:var(--font-mono);
+  font-size:10px;letter-spacing:3px;
+  color:var(--text-muted);
+  background:none;border:none;
+  padding:.4rem .8rem;
+  border:1px solid var(--border);
+  border-radius:2px;
+  transition:all .2s;
+}
+.fav-tab:hover,.fav-tab.active{
+  color:var(--accent);border-color:var(--accent);
+}
+
 /* Responsive */
 @media(max-width:500px){
   .ticket-row{flex-direction:column;align-items:center}
@@ -1125,6 +1228,7 @@ body.theme-hollywood::before{
       </div>
       <div class="header-rule"></div>
       <div class="header-sub">Your mood · Your movie · Your plan</div>
+      <div style="margin-top:.75rem"><button class="fav-tab" id="fav-tab-btn" onclick="toggleFavPanel()">★ MY FAVOURITES</button></div>
     </div>
   </div>
 
@@ -1187,6 +1291,15 @@ body.theme-hollywood::before{
   </div>
 </div>
 
+<!-- FAVOURITES PANEL -->
+<div class="fav-panel" id="fav-panel">
+  <div class="fav-panel-header">
+    <div class="fav-panel-title">★ MY FAVOURITES</div>
+    <button class="fav-panel-clear" onclick="clearFavs()">すべて削除</button>
+  </div>
+  <div class="fav-list" id="fav-list"></div>
+</div>
+
 <!-- MODAL -->
 <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
   <div class="modal">
@@ -1221,6 +1334,7 @@ body.theme-hollywood::before{
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M8 21h8M12 19v2"/></svg>
           どこで見る？
         </a>
+        <button class="btn-star" id="btn-star" onclick="toggleFav()" title="お気に入り">☆</button>
         <button class="btn btn-primary" onclick="reroll()">もう一度 ↺</button>
         <button class="btn btn-secondary" onclick="closeModalDirect()">閉じる ✕</button>
       </div>
@@ -1460,6 +1574,125 @@ function renderTL(mode){
 }
 
 init();
+
+// ── FAVOURITES ────────────────────────────────────
+let favs = JSON.parse(localStorage.getItem('cs_favs')||'[]');
+
+function saveFavs(){localStorage.setItem('cs_favs',JSON.stringify(favs));}
+
+function toggleFav(){
+  if(!currentMovie)return;
+  const key=currentMovie.t+'_'+currentMovie.y;
+  const idx=favs.findIndex(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
+  const btn=document.getElementById('btn-star');
+  if(idx>=0){
+    favs.splice(idx,1);
+    btn.textContent='☆';
+    btn.classList.remove('starred','burst');
+  } else {
+    favs.push({t:currentMovie.t,j:currentMovie.j,y:currentMovie.y,g:currentMovie.g,dir:currentMovie.dir,moodId:currentMoodId});
+    btn.textContent='★';
+    btn.classList.add('starred');
+    // バースト＋パーティクル
+    btn.classList.remove('burst');
+    void btn.offsetWidth;
+    btn.classList.add('burst');
+    spawnParticles(btn);
+  }
+  saveFavs();
+  renderFavs();
+}
+
+function spawnParticles(el){
+  const rect=el.getBoundingClientRect();
+  const cx=rect.left+rect.width/2;
+  const cy=rect.top+rect.height/2;
+  for(let i=0;i<8;i++){
+    const p=document.createElement('div');
+    p.className='star-particle';
+    const angle=(i/8)*Math.PI*2;
+    const dist=30+Math.random()*20;
+    p.style.cssText=`left:${cx}px;top:${cy}px;position:fixed;z-index:9999;` +
+      `transform:translate(-50%,-50%);` +
+      `animation:sparkle .5s ease-out ${i*40}ms forwards;`;
+    p.style.setProperty('--tx', Math.cos(angle)*dist+'px');
+    p.style.setProperty('--ty', Math.sin(angle)*dist+'px');
+    // 方向をランダムに
+    p.style.transformOrigin='center';
+    p.style.marginLeft=Math.cos(angle)*dist+'px';
+    p.style.marginTop=Math.sin(angle)*dist+'px';
+    document.body.appendChild(p);
+    setTimeout(()=>p.remove(), 600+i*40);
+  }
+}
+
+function updateStarBtn(){
+  if(!currentMovie)return;
+  const btn=document.getElementById('btn-star');
+  if(!btn)return;
+  const starred=favs.some(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
+  btn.textContent=starred?'★':'☆';
+  btn.classList.toggle('starred',starred);
+}
+
+function renderFavs(){
+  const list=document.getElementById('fav-list');
+  if(!list)return;
+  if(favs.length===0){
+    list.innerHTML='<div class="fav-empty">— まだお気に入りがありません —</div>';
+    return;
+  }
+  list.innerHTML=favs.map((f,i)=>`
+    <div class="fav-item" onclick="showFavMovie(${i})">
+      <button class="fav-item-remove" onclick="removeFav(event,${i})">✕</button>
+      <div class="fav-item-title">${f.j||f.t}</div>
+      <div class="fav-item-sub">${f.t} (${f.y}) · ${f.dir||'—'}</div>
+    </div>`).join('');
+}
+
+function showFavMovie(i){
+  const f=favs[i];
+  if(!f)return;
+  // DBから対応する映画を探す
+  for(const [mood,movies] of Object.entries(DB)){
+    const m=movies.find(mv=>mv.t===f.t&&mv.y===f.y);
+    if(m){
+      currentMoodId=mood;
+      currentMovie=m;
+      showModal(m);
+      // パネルを閉じる
+      document.getElementById('fav-panel').classList.remove('vis');
+      document.getElementById('fav-tab-btn').classList.remove('active');
+      return;
+    }
+  }
+}
+
+function removeFav(e,i){
+  e.stopPropagation();
+  favs.splice(i,1);
+  saveFavs();
+  renderFavs();
+}
+
+function clearFavs(){
+  if(!confirm('お気に入りをすべて削除しますか？'))return;
+  favs=[];
+  saveFavs();
+  renderFavs();
+}
+
+function toggleFavPanel(){
+  const panel=document.getElementById('fav-panel');
+  const btn=document.getElementById('fav-tab-btn');
+  const isVis=panel.classList.toggle('vis');
+  btn.classList.toggle('active',isVis);
+  if(isVis){
+    renderFavs();
+    panel.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
 </script>
 </body>
 </html>
