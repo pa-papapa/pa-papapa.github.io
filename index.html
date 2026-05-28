@@ -420,6 +420,14 @@ body.theme-hollywood::before{
 .theme-hollywood .ticket:not(.active) .ticket-name{color:#8a6a30}
 .theme-grindhouse .ticket-name{font-size:1.15rem;letter-spacing:2px}
 .ticket.active .ticket-name{color:var(--ticket-active-text)}
+.ticket-name-sub{
+  font-size:10px;
+  color:var(--text-muted);
+  font-family:var(--font-body);
+  letter-spacing:2px;
+  margin-top:1px;
+  margin-bottom:2px;
+}
 .ticket-num{font-size:9px;color:var(--text-muted);font-family:var(--font-mono)}
 
 /* Grindhouse: non-active dim */
@@ -1038,11 +1046,11 @@ body.theme-hollywood::before{
 .btn-bookmark{
   display:inline-flex;align-items:center;gap:5px;
   background:none;
-  border:1px solid var(--border);
+  border:1px solid rgba(200,160,32,.5);
   border-radius:2px;
   padding:5px 10px;
   cursor:pointer;
-  color:var(--text-muted);
+  color:rgba(200,160,32,.8);
   font-family:var(--font-mono);
   font-size:10px;letter-spacing:2px;
   white-space:nowrap;
@@ -1099,6 +1107,84 @@ body.theme-hollywood::before{
   background:#ffcc00;
   animation:sparkle .5s ease-out forwards;
 }
+
+
+/* ══ BOOKMARKS BAR ══ */
+.bookmarks-bar{
+  max-width:900px;margin:0 auto;
+  padding:.5rem 1.5rem;
+  display:flex;justify-content:center;
+}
+.bookmarks-bar-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:none;
+  border:1px solid var(--accent-dim);
+  border-radius:2px;
+  padding:.4rem 1.2rem;
+  cursor:pointer;
+  color:var(--accent);
+  font-family:var(--font-mono);
+  font-size:10px;letter-spacing:3px;
+  transition:all .2s;
+}
+.bookmarks-bar-btn:hover{
+  border-color:var(--accent);
+  background:rgba(200,160,32,.08);
+}
+.bookmarks-count{
+  background:var(--accent);
+  color:#0a0804;
+  font-size:9px;
+  font-weight:700;
+  padding:1px 6px;
+  border-radius:10px;
+  min-width:16px;
+  text-align:center;
+}
+
+/* ══ BOOKMARKS POPUP ══ */
+.fav-popup-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.7);
+  z-index:1000;
+  align-items:center;
+  justify-content:center;
+}
+.fav-popup-overlay.vis{display:flex;}
+.fav-popup{
+  background:var(--surface);
+  border:1px solid var(--border-hi);
+  border-radius:4px;
+  width:min(640px,90vw);
+  max-height:80vh;
+  overflow-y:auto;
+  padding:1.5rem;
+  position:relative;
+}
+.theme-grindhouse .fav-popup{
+  box-shadow:0 0 30px rgba(200,160,32,.15);
+}
+.theme-hollywood .fav-popup{
+  box-shadow:0 0 30px rgba(201,146,42,.15);
+}
+.fav-popup-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:1rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:.75rem;
+}
+.fav-popup-close{
+  background:none;border:none;
+  cursor:pointer;
+  color:var(--text-muted);
+  font-size:16px;
+  line-height:1;
+  padding:4px 8px;
+  transition:color .2s;
+}
+.fav-popup-close:hover{color:var(--accent);}
 
 /* ══ FAVOURITES PANEL ══ */
 .fav-panel{
@@ -1266,7 +1352,6 @@ body.theme-hollywood::before{
       </div>
       <div class="header-rule"></div>
       <div class="header-sub">Your mood · Your movie · Your plan</div>
-      <div style="margin-top:.75rem"><button class="fav-tab" id="fav-tab-btn" onclick="toggleFavPanel()">★ MY FAVOURITES</button></div>
     </div>
   </div>
 
@@ -1277,8 +1362,9 @@ body.theme-hollywood::before{
       <div class="ticket-inner">
         <div class="ticket-stub"><div class="ticket-stub-text">Admit One</div></div>
         <div class="ticket-body">
-          <div class="ticket-label">Main Screen</div>
-          <div class="ticket-name">メインスクリーン</div>
+          <div class="ticket-label">Big Screen</div>
+          <div class="ticket-name">BIG SCREEN</div>
+          <div class="ticket-name-sub">ビッグスクリーン</div>
           <div class="ticket-num">No.0001 — Major Films</div>
         </div>
       </div>
@@ -1290,12 +1376,22 @@ body.theme-hollywood::before{
         <div class="ticket-stub"><div class="ticket-stub-text">Admit One</div></div>
         <div class="ticket-body">
           <div class="ticket-label">Mini Theatre</div>
-          <div class="ticket-name">ミニシアター</div>
+          <div class="ticket-name">MINI THEATRE</div>
+          <div class="ticket-name-sub">ミニシアター</div>
           <div class="ticket-num">No.0002 — Art House</div>
         </div>
       </div>
       <div class="ticket-perf-bot"></div>
     </div>
+  </div>
+
+  <!-- BOOKMARKS BAR -->
+  <div class="bookmarks-bar" id="bookmarks-bar" style="display:none">
+    <button class="bookmarks-bar-btn" onclick="toggleFavPanel()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+      MY BOOKMARKS
+      <span class="bookmarks-count" id="bookmarks-count">0</span>
+    </button>
   </div>
 
   <!-- MAIN PANE -->
@@ -1330,12 +1426,18 @@ body.theme-hollywood::before{
 </div>
 
 <!-- FAVOURITES PANEL -->
-<div class="fav-panel" id="fav-panel">
-  <div class="fav-panel-header">
-    <div class="fav-panel-title">★ MY FAVOURITES</div>
-    <button class="fav-panel-clear" onclick="clearFavs()">すべて削除</button>
+<!-- BOOKMARKS POPUP -->
+<div class="fav-popup-overlay" id="fav-popup-overlay" onclick="closeFavPopup(event)">
+  <div class="fav-popup">
+    <div class="fav-popup-header">
+      <div class="fav-panel-title">★ MY BOOKMARKS</div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <button class="fav-panel-clear" onclick="clearFavs()">すべて削除</button>
+        <button class="fav-popup-close" onclick="toggleFavPanel()">✕</button>
+      </div>
+    </div>
+    <div class="fav-list" id="fav-list"></div>
   </div>
-  <div class="fav-list" id="fav-list"></div>
 </div>
 
 <!-- MODAL -->
@@ -1454,12 +1556,37 @@ window.addEventListener('resize',()=>{
 function buildFilmRoll(id,moods,mode){
   const el=document.getElementById(id);
   if(!el)return;
-  el.innerHTML=[...moods,...moods,...moods,...moods].map(m=>`
+  const frames=[...moods,...moods,...moods,...moods].map(m=>`
     <div class="film-frame" onclick="pickMood('${m.id}','${mode}')">
       <span class="film-icon">${m.icon.startsWith('<svg') ? m.icon : m.icon}</span>
       <div class="film-label">${m.n}</div>
       <div class="film-sublabel">${m.d}</div>
     </div>`).join('');
+  el.innerHTML=frames;
+}
+
+function buildBookmarkFrame(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  // 既存コマの先頭にBookmarkコマを挿入（または更新）
+  const existing=el.querySelectorAll('.film-frame-bookmark');
+  existing.forEach(e=>e.remove());
+  if(favs.length===0)return;
+  const bookmarkSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120" width="44" height="44"><circle cx="0" cy="0" r="50" fill="none" stroke="#ffcc00" stroke-width="3"/><circle cx="0" cy="0" r="42" fill="none" stroke="#ffcc00" stroke-width=".8" opacity=".4"/><path d="M-15,-28 L15,-28 L15,28 L0,16 L-15,28 Z" fill="none" stroke="#ffcc00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="0" cy="-8" r="3" fill="#ffcc00"/></svg>`;
+  const frame=document.createElement('div');
+  frame.className='film-frame film-frame-bookmark';
+  frame.innerHTML=`<span class="film-icon">${bookmarkSvg}</span><div class="film-label">MY PICKS</div><div class="film-sublabel">${favs.length}本</div>`;
+  frame.onclick=()=>pickFromBookmarks();
+  el.insertBefore(frame,el.firstChild);
+}
+
+function pickFromBookmarks(){
+  if(favs.length===0)return;
+  const f=favs[Math.floor(Math.random()*favs.length)];
+  for(const[mood,movies]of Object.entries(DB)){
+    const m=movies.find(mv=>mv.t===f.t&&mv.y===f.y);
+    if(m){currentMoodId=mood;currentMovie=m;showModal(m);return;}
+  }
 }
 function init(){
   buildPerfs('pm-top');buildPerfs('pm-bot');
@@ -1469,6 +1596,7 @@ function init(){
   setTheme('grindhouse');
   const titleEl=document.querySelector('.header-title');
   if(titleEl){titleEl.innerHTML='CINEMA<br>SELECT';titleEl.setAttribute('data-text','CINEMA SELECT');}
+  updateBookmarksUI();
 }
 
 // ── TABS ─────────────────────────────────────────────
@@ -1623,7 +1751,7 @@ init();
 // ── FAVOURITES ────────────────────────────────────
 let favs = JSON.parse(localStorage.getItem('cs_favs')||'[]');
 
-function saveFavs(){localStorage.setItem('cs_favs',JSON.stringify(favs));}
+function saveFavs(){localStorage.setItem('cs_favs',JSON.stringify(favs));updateBookmarksUI();}
 
 function toggleFav(){
   if(!currentMovie)return;
@@ -1672,30 +1800,47 @@ function spawnParticles(el){
 }
 
 function updateStarBtn(){
-  if(!currentMovie)return;
   const btn=document.getElementById('btn-star');
   if(!btn)return;
-  const starred=favs.some(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
+  // まず全てリセット
+  btn.classList.remove('starred','burst');
   const label=btn.querySelector('.btn-bookmark-label');
-  if(label) label.textContent=starred?'Bookmarked':'Bookmark';
+  if(label) label.textContent='Bookmark';
   const svg=btn.querySelector('svg');
-  if(svg) svg.setAttribute('fill', starred?'currentColor':'none');
-  btn.classList.toggle('starred',starred);
+  if(svg) svg.setAttribute('fill','none');
+  // currentMovieがあれば保存状態を確認
+  if(!currentMovie)return;
+  const starred=favs.some(f=>f.t===currentMovie.t&&f.y===currentMovie.y);
+  if(starred){
+    btn.classList.add('starred');
+    if(label) label.textContent='Bookmarked';
+    if(svg) svg.setAttribute('fill','currentColor');
+  }
 }
 
 function renderFavs(){
   const list=document.getElementById('fav-list');
   if(!list)return;
   if(favs.length===0){
-    list.innerHTML='<div class="fav-empty">— まだお気に入りがありません —</div>';
-    return;
+    list.innerHTML='<div class="fav-empty">— まだブックマークがありません —</div>';
+  } else {
+    list.innerHTML=favs.map((f,i)=>`
+      <div class="fav-item" onclick="showFavMovie(${i})">
+        <button class="fav-item-remove" onclick="removeFav(event,${i})">✕</button>
+        <div class="fav-item-title">${f.j||f.t}</div>
+        <div class="fav-item-sub">${f.t} (${f.y}) · ${f.dir||'—'}</div>
+      </div>`).join('');
   }
-  list.innerHTML=favs.map((f,i)=>`
-    <div class="fav-item" onclick="showFavMovie(${i})">
-      <button class="fav-item-remove" onclick="removeFav(event,${i})">✕</button>
-      <div class="fav-item-title">${f.j||f.t}</div>
-      <div class="fav-item-sub">${f.t} (${f.y}) · ${f.dir||'—'}</div>
-    </div>`).join('');
+  updateBookmarksUI();
+}
+
+function updateBookmarksUI(){
+  const bar=document.getElementById('bookmarks-bar');
+  const cnt=document.getElementById('bookmarks-count');
+  if(bar) bar.style.display=favs.length>0?'flex':'none';
+  if(cnt) cnt.textContent=favs.length;
+  buildBookmarkFrame('film-main');
+  buildBookmarkFrame('film-mini');
 }
 
 function showFavMovie(i){
@@ -1731,14 +1876,13 @@ function clearFavs(){
 }
 
 function toggleFavPanel(){
-  const panel=document.getElementById('fav-panel');
-  const btn=document.getElementById('fav-tab-btn');
-  const isVis=panel.classList.toggle('vis');
-  btn.classList.toggle('active',isVis);
-  if(isVis){
-    renderFavs();
-    panel.scrollIntoView({behavior:'smooth',block:'start'});
-  }
+  const overlay=document.getElementById('fav-popup-overlay');
+  const isVis=overlay.classList.toggle('vis');
+  if(isVis) renderFavs();
+}
+
+function closeFavPopup(e){
+  if(e.target===document.getElementById('fav-popup-overlay')) toggleFavPanel();
 }
 
 </script>
