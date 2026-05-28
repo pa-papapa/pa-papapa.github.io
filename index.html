@@ -1533,6 +1533,7 @@ const MN=[
 let currentTab='main';
 let currentMovie=null;
 let currentMoodId=null;
+let favs = JSON.parse(localStorage.getItem('cs_favs')||'[]');
 let scheduleMain=[];
 let scheduleMini=[];
 let currentTheme='grindhouse';
@@ -1749,7 +1750,6 @@ function renderTL(mode){
 init();
 
 // ── FAVOURITES ────────────────────────────────────
-let favs = JSON.parse(localStorage.getItem('cs_favs')||'[]');
 
 function saveFavs(){localStorage.setItem('cs_favs',JSON.stringify(favs));updateBookmarksUI();}
 
