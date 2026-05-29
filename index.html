@@ -1497,6 +1497,7 @@ fetch('movies.json')
   .then(data => {
     DB = data;
     console.log('movies.json loaded:', Object.values(DB).reduce((a,b)=>a+b.length,0), '本');
+    updateBookmarksUI();
   })
   .catch(e => console.error('movies.json 読み込みエラー:', e));
 
@@ -1569,16 +1570,22 @@ function buildFilmRoll(id,moods,mode){
 function buildBookmarkFrame(id){
   const el=document.getElementById(id);
   if(!el)return;
-  // 既存コマの先頭にBookmarkコマを挿入（または更新）
-  const existing=el.querySelectorAll('.film-frame-bookmark');
-  existing.forEach(e=>e.remove());
+  // 既存のBookmarkコマを全て削除
+  el.querySelectorAll('.film-frame-bookmark').forEach(e=>e.remove());
   if(favs.length===0)return;
   const bookmarkSvg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120" width="44" height="44"><circle cx="0" cy="0" r="50" fill="none" stroke="#ffcc00" stroke-width="3"/><circle cx="0" cy="0" r="42" fill="none" stroke="#ffcc00" stroke-width=".8" opacity=".4"/><path d="M-15,-28 L15,-28 L15,28 L0,16 L-15,28 Z" fill="none" stroke="#ffcc00" stroke-width="2.5" stroke-linejoin="round"/><circle cx="0" cy="-8" r="3" fill="#ffcc00"/></svg>`;
-  const frame=document.createElement('div');
-  frame.className='film-frame film-frame-bookmark';
-  frame.innerHTML=`<span class="film-icon">${bookmarkSvg}</span><div class="film-label">MY PICKS</div><div class="film-sublabel">${favs.length}本</div>`;
-  frame.onclick=()=>pickFromBookmarks();
-  el.insertBefore(frame,el.firstChild);
+  // 4箇所に挿入（4倍複製に対応）
+  const frames=el.querySelectorAll('.film-frame:not(.film-frame-bookmark)');
+  const total=frames.length;
+  const quarter=Math.floor(total/4);
+  [0, quarter, quarter*2, quarter*3].forEach(pos=>{
+    const frame=document.createElement('div');
+    frame.className='film-frame film-frame-bookmark';
+    frame.innerHTML=`<span class="film-icon">${bookmarkSvg}</span><div class="film-label">MY PICKS</div><div class="film-sublabel">${favs.length}本</div>`;
+    frame.onclick=()=>pickFromBookmarks();
+    if(frames[pos]) el.insertBefore(frame, frames[pos]);
+    else el.appendChild(frame);
+  });
 }
 
 function pickFromBookmarks(){
