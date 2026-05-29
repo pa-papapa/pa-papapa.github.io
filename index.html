@@ -1648,6 +1648,7 @@ function showModal(m){
   ow.style.display=m.o?'flex':'none';
   document.getElementById('modal-overlay').classList.add('open');
   document.body.style.overflow='hidden';
+  updateStarBtn();
 }
 function closeModal(e){if(e.target===document.getElementById('modal-overlay'))closeModalDirect()}
 function closeModalDirect(){
