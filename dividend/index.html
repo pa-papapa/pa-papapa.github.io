@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>配当収入ダッシュボード [DEMO]</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700&family=DM+Mono:wght@400;500&display=swap');
+:root{
+  --bg:#0f1117;--surface:#181c27;--surface2:#1e2436;--border:#2a3050;
+  --c1:#f6ad55;--c2:#4fd1c5;--c3:#f687b3;--c4:#68d391;--c5:#86efac;--c6:#fbbf24;
+  --total:#a78bfa;--text:#e2e8f0;--muted:#7888a4;--dim:#4a5568;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;font-weight:300;min-height:100vh;}
+nav{background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;padding:0 24px;}
+.nav-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;}
+.nav-logo{font-size:13px;font-weight:700;padding:14px 20px 14px 0;border-right:1px solid var(--border);margin-right:8px;white-space:nowrap;}
+.nav-logo span{color:var(--total);}
+.nav-tab{padding:16px 18px;font-size:12px;color:var(--muted);cursor:pointer;border:none;background:none;font-family:'Noto Sans JP',sans-serif;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--text);border-bottom-color:var(--total);}
+.filter-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:0 24px;}
+.filter-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:6px;padding:7px 0;flex-wrap:wrap;}
+.filter-label{font-size:10px;color:var(--dim);font-family:'DM Mono',monospace;margin-right:2px;white-space:nowrap;}
+.fbtn{padding:4px 11px;border-radius:20px;font-size:11px;cursor:pointer;color:var(--muted);border:1px solid var(--border);background:none;font-family:'DM Mono',monospace;transition:all .2s;white-space:nowrap;}
+.fbtn:hover{color:var(--text);border-color:var(--muted);}
+.fbtn.active{background:var(--total);color:#fff;border-color:var(--total);}
+.month-filter-row{border-top:1px solid var(--border);display:none;}
+main{max-width:1200px;margin:0 auto;padding:24px 24px 80px;}
+.page{display:none;}
+.page.active{display:block;}
+.kpi-row{display:grid;gap:12px;margin-bottom:16px;}
+.cols3{grid-template-columns:repeat(3,1fr);}
+.cols4{grid-template-columns:repeat(4,1fr);}
+.cols5{grid-template-columns:repeat(5,1fr);}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--kc,var(--total));}
+.kpi-label{font-size:10px;color:var(--muted);margin-bottom:6px;font-family:'DM Mono',monospace;line-height:1.4;}
+.kpi-value{font-family:'DM Mono',monospace;font-size:clamp(16px,2vw,24px);font-weight:500;line-height:1;letter-spacing:-.02em;color:var(--kc,var(--total));}
+.kpi-unit{font-size:11px;opacity:.6;margin-left:2px;}
+.kpi-note{margin-top:5px;font-size:10px;color:var(--dim);}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:22px;margin-bottom:16px;}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.card-title{font-size:13px;font-weight:600;}
+.card-sub{font-size:11px;color:var(--muted);margin-left:auto;font-family:'DM Mono',monospace;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.legend{display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;}
+.ldot{width:7px;height:7px;border-radius:2px;flex-shrink:0;}
+.rank-list{display:flex;flex-direction:column;gap:7px;}
+.ri{display:flex;align-items:center;gap:8px;}
+.rn{font-size:11px;color:var(--muted);width:130px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rb-wrap{flex:1;background:var(--surface2);border-radius:3px;height:6px;overflow:hidden;}
+.rb{height:100%;border-radius:3px;}
+.rv{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:68px;text-align:right;flex-shrink:0;}
+.source-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px;}
+.source-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
+.sc-header{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.sc-badge{font-size:10px;font-family:'DM Mono',monospace;padding:2px 7px;border-radius:4px;}
+.sc-total{font-family:'DM Mono',monospace;font-size:18px;font-weight:500;margin-bottom:8px;}
+.sc-items{display:flex;flex-direction:column;gap:4px;}
+.sc-item{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);}
+.sc-item:last-child{border-bottom:none;}
+.sc-item-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px;}
+.sc-item-val{font-family:'DM Mono',monospace;flex-shrink:0;margin-left:8px;}
+.no-data{text-align:center;padding:32px;color:var(--dim);font-size:13px;}
+.month-detail-title{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin:20px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border);}
+@media(max-width:720px){.cols5{grid-template-columns:repeat(2,1fr);}.cols4{grid-template-columns:repeat(2,1fr);}.two-col{grid-template-columns:1fr;}.rn{width:90px;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-logo">配当収入 <span>Tracker</span><span style="font-size:9px;background:#a78bfa33;color:#a78bfa;border:1px solid #a78bfa55;border-radius:4px;padding:1px 6px;margin-left:6px;font-family:'DM Mono',monospace;letter-spacing:.05em;">DEMO</span></div>
+    <button class="nav-tab active" onclick="showPage('overview',this)">📊 概要</button>
+    <button class="nav-tab" onclick="showPage('sbi',this)">🏦 SBI</button>
+    <button class="nav-tab" onclick="showPage('rakuten',this)">📈 楽天</button>
+    <button class="nav-tab" onclick="showPage('froggy',this)">🐸 フロッギー</button>
+  </div>
+</nav>
+
+<div class="filter-bar">
+  <div class="filter-inner">
+    <span class="filter-label">年：</span>
+    <button class="fbtn active" id="fy-all" onclick="setYearFilter('all',this)">全期間</button>
+    <button class="fbtn" onclick="setYearFilter('2026',this)">2026</button>
+    <button class="fbtn" onclick="setYearFilter('2025',this)">2025</button>
+    <button class="fbtn" onclick="setYearFilter('2024',this)">2024</button>
+    <button class="fbtn" onclick="setYearFilter('2023',this)">2023</button>
+    <button class="fbtn" onclick="setYearFilter('2022',this)">2022</button>
+    <button class="fbtn" onclick="setYearFilter('2021',this)">2021</button>
+  </div>
+  <div class="filter-inner month-filter-row" id="monthFilterRow">
+    <span class="filter-label">月：</span>
+    <button class="fbtn active" id="fm-all" onclick="setMonthFilter('all',this)">全月</button>
+    <span id="monthBtns" style="display:contents"></span>
+  </div>
+</div>
+
+<main>
+<div style="max-width:1200px;margin:16px auto 0;padding:0 24px;">
+  <div style="background:#a78bfa18;border:1px solid #a78bfa44;border-radius:8px;padding:10px 16px;font-size:11px;color:#a78bfa;font-family:'DM Mono',monospace;display:flex;align-items:center;gap:8px;">
+    <span>⚠️</span>
+    <span>このダッシュボードはデモ用サンプルデータです。銘柄名・金額はすべて架空であり、実際の証券口座・銘柄・金額とは一切関係ありません。</span>
+  </div>
+</div>
+
+<!-- 概要ページ -->
+<div id="page-overview" class="page active">
+  <div id="ovKpiRow" class="kpi-row cols5"></div>
+  <div class="card">
+    <div class="card-header"><div class="cdot" style="background:var(--total)"></div><div class="card-title">年別収入推移（円建て）</div><div class="card-sub" id="ovYearSub"></div></div>
+    <div style="position:relative;height:250px"><canvas id="ovYearChart"></canvas></div>
+    <div class="legend">
+      <div class="li"><div class="ldot" style="background:var(--c1)"></div>SBI 配当外</div>
+      <div class="li"><div class="ldot" style="background:var(--c2)"></div>SBI 貸株中</div>
+      <div class="li"><div class="ldot" style="background:var(--c3)"></div>楽天 円</div>
+      <div class="li"><div class="ldot" style="background:var(--c5)"></div>フロッギー</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="cdot" style="background:var(--total)"></div><div class="card-title">月別収入推移（円建て）</div></div>
+    <div style="position:relative;height:230px"><canvas id="ovMonthChart"></canvas></div>
+  </div>
+  <div id="ovMonthDetail"></div>
+</div>
+
+<!-- SBIページ -->
+<div id="page-sbi" class="page">
+  <div id="sbiKpiRow" class="kpi-row cols3"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--total)"></div><div class="card-title">年別推移</div></div>
+      <div style="position:relative;height:210px"><canvas id="sbiYearChart"></canvas></div>
+      <div class="legend">
+        <div class="li"><div class="ldot" style="background:var(--c1)"></div>配当外</div>
+        <div class="li"><div class="ldot" style="background:var(--c2)"></div>貸株中</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--total)"></div><div class="card-title">月別推移</div></div>
+      <div style="position:relative;height:210px"><canvas id="sbiMonthChart"></canvas></div>
+      <div class="legend">
+        <div class="li"><div class="ldot" style="background:var(--c1)"></div>配当外</div>
+        <div class="li"><div class="ldot" style="background:var(--c2)"></div>貸株中</div>
+      </div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card"><div class="card-header"><div class="cdot" style="background:var(--c1)"></div><div class="card-title">配当（貸株外）銘柄別</div></div><div class="rank-list" id="rSbiDist"></div></div>
+    <div class="card"><div class="card-header"><div class="cdot" style="background:var(--c2)"></div><div class="card-title">配当相当額（貸株中）銘柄別</div></div><div class="rank-list" id="rSbiDiv"></div></div>
+  </div>
+</div>
+
+<!-- 楽天ページ -->
+<div id="page-rakuten" class="page">
+  <div id="rakKpiRow" class="kpi-row cols3"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--c3)"></div><div class="card-title">年別推移（円建て）</div></div>
+      <div style="position:relative;height:210px"><canvas id="rakYearChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--c3)"></div><div class="card-title">月別推移（円建て）</div></div>
+      <div style="position:relative;height:210px"><canvas id="rakMonthChart"></canvas></div>
+    </div>
+  </div>
+  <div class="two-col">
+    <div class="card"><div class="card-header"><div class="cdot" style="background:var(--c3)"></div><div class="card-title">円建て銘柄別</div></div><div class="rank-list" id="rRakJpy"></div></div>
+    <div class="card"><div class="card-header"><div class="cdot" style="background:var(--c4)"></div><div class="card-title">ドル建て銘柄別（受取$）</div></div><div class="rank-list" id="rRakUsd"></div></div>
+  </div>
+</div>
+
+<!-- フロッギーページ -->
+<div id="page-froggy" class="page">
+  <div id="frogKpiRow" class="kpi-row cols4"></div>
+  <div class="two-col">
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--c5)"></div><div class="card-title">年別 配当 vs ポイント投入</div></div>
+      <div style="position:relative;height:210px"><canvas id="frogYearChart"></canvas></div>
+      <div class="legend">
+        <div class="li"><div class="ldot" style="background:var(--c5)"></div>配当金</div>
+        <div class="li"><div class="ldot" style="background:var(--c6);opacity:.5"></div>ポイント投入</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="cdot" style="background:var(--c5)"></div><div class="card-title">月別配当推移</div></div>
+      <div style="position:relative;height:210px"><canvas id="frogMonthChart"></canvas></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-header"><div class="cdot" style="background:var(--c5)"></div><div class="card-title">銘柄別累計 TOP20</div><div class="card-sub">全87銘柄</div></div>
+    <div class="two-col" style="margin-bottom:0"><div class="rank-list" id="rFrog1"></div><div class="rank-list" id="rFrog2"></div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const MONTHS=["2021/12", "2022/01", "2022/02", "2022/03", "2022/04", "2022/05", "2022/06", "2022/07", "2022/08", "2022/09", "2022/10", "2022/11", "2022/12", "2023/01", "2023/02", "2023/03", "2023/04", "2023/05", "2023/06", "2023/07", "2023/08", "2023/09", "2023/10", "2023/11", "2023/12", "2024/01", "2024/02", "2024/03", "2024/04", "2024/05", "2024/06", "2024/07", "2024/08", "2024/09", "2024/10", "2024/11", "2024/12", "2025/01", "2025/02", "2025/03", "2025/04", "2025/05", "2025/06", "2025/07", "2025/08", "2025/09", "2025/10", "2025/11", "2025/12", "2026/01", "2026/02", "2026/03", "2026/04", "2026/05", "2026/06"];
+const YEARS=["2021", "2022", "2023", "2024", "2025", "2026"];
+const YEAR_DATA={"2021": {"sbi_dist": 4100, "sbi_div": 0, "rak_jpy": 0, "rak_usd": 1.34, "frog_div": 0, "frog_pt": 0}, "2022": {"sbi_dist": 61900, "sbi_div": 42400, "rak_jpy": 6800, "rak_usd": 31.28, "frog_div": 529, "frog_pt": 55200}, "2023": {"sbi_dist": 59500, "sbi_div": 44300, "rak_jpy": 8000, "rak_usd": 36.96, "frog_div": 1629, "frog_pt": 36600}, "2024": {"sbi_dist": 58500, "sbi_div": 50800, "rak_jpy": 3800, "rak_usd": 40.66, "frog_div": 1722, "frog_pt": 13600}, "2025": {"sbi_dist": 85800, "sbi_div": 53800, "rak_jpy": 22600, "rak_usd": 40.24, "frog_div": 2150, "frog_pt": 19600}, "2026": {"sbi_dist": 16300, "sbi_div": 21500, "rak_jpy": 10700, "rak_usd": 16.17, "frog_div": 1173, "frog_pt": 7600}};
+const SBI_DIST_M={"2021/12": {"製薬系１": 2000, "エネルギー系１": 1500, "物産系１": 500}, "2022/01": {"商社系１": 4100, "テック系１": 1200}, "2022/02": {}, "2022/03": {"素材系１": 10500}, "2022/04": {}, "2022/05": {"金融系１": 1900}, "2022/06": {"電機系１": 1400, "製薬系１": 7000, "物産系１": 300, "建設系１": 4200, "精密系１": 1200}, "2022/07": {"不動産系１": 1900}, "2022/08": {"食品系１": 4800, "商社系１": 4100}, "2022/09": {"素材系１": 10500}, "2022/10": {}, "2022/11": {"化学系１": 1400, "製薬系１": 6300}, "2022/12": {"精密系１": 1200}, "2023/01": {"商社系１": 4900, "不動産系１": 1900, "テック系１": 1200}, "2023/02": {}, "2023/03": {"素材系１": 15800}, "2023/04": {}, "2023/05": {}, "2023/06": {"電機系１": 1400, "製薬系１": 6300, "建設系１": 1400, "物産系１": 300, "工業系１": 1900}, "2023/07": {"不動産系１": 1900}, "2023/08": {"食品系１": 5300, "商社系１": 4900}, "2023/09": {"物流系１": 2900}, "2023/10": {}, "2023/11": {"製薬系１": 8300}, "2023/12": {"工業系１": 1200}, "2024/01": {"商社系１": 5600, "不動産系１": 1700}, "2024/02": {}, "2024/03": {"物流系１": 4200}, "2024/04": {}, "2024/05": {}, "2024/06": {"電機系１": 1400, "建設系１": 3600, "物産系１": 1000, "製薬系１": 8300, "工業系１": 1900}, "2024/07": {"不動産系１": 1700}, "2024/08": {"食品系１": 5400, "商社系１": 5600}, "2024/09": {"物流系１": 2900}, "2024/10": {}, "2024/11": {"製薬系１": 13900}, "2024/12": {"工業系１": 1200}, "2025/01": {"商社系１": 6300, "不動産系１": 1700}, "2025/02": {}, "2025/03": {"物流系１": 4200}, "2025/04": {}, "2025/05": {}, "2025/06": {"電機系１": 1400, "製薬系１": 20900, "建設系１": 1400, "物産系１": 2400, "工業系１": 1900, "化学系１": 700, "食品系１": 1400}, "2025/07": {"不動産系１": 1900}, "2025/08": {"食品系１": 5600, "商社系１": 10500}, "2025/09": {"物流系１": 2900}, "2025/10": {}, "2025/11": {"製薬系１": 20900, "化学系１": 700}, "2025/12": {"工業系１": 1200}, "2026/01": {"商社系１": 8300, "不動産系１": 1900}, "2026/02": {}, "2026/03": {"物流系１": 4200}, "2026/04": {}, "2026/05": {}, "2026/06": {"工業系１": 1900}};
+const SBI_DIV_M={"2021/12": {}, "2022/01": {}, "2022/02": {}, "2022/03": {"リート系１": 200}, "2022/04": {"リート系２": 300}, "2022/05": {"リート系３": 300}, "2022/06": {"電機系２": 2200, "鉄鋼系１": 8000, "金融系２": 2200, "リート系１": 300}, "2022/07": {"エネルギー系２": 1500, "金融系１": 2000, "リート系２": 200, "投信系１": 300}, "2022/08": {"リート系３": 200}, "2022/09": {"リート系１": 300}, "2022/10": {"リート系２": 400}, "2022/11": {"教育系１": 1900, "リート系３": 300}, "2022/12": {"鉄鋼系１": 12200, "精密系２": 2900, "エネルギー系２": 1500, "金融系１": 2400, "製造系１": 300, "金融系２": 2200, "リート系１": 300}, "2023/01": {"リート系２": 200, "投信系１": 300}, "2023/02": {"リート系３": 200}, "2023/03": {"リート系１": 300}, "2023/04": {"リート系４": 400}, "2023/05": {"リート系３": 300}, "2023/06": {"鉄鋼系１": 12200, "金融系２": 2700, "リート系１": 300}, "2023/07": {"エネルギー系２": 1500, "金融系１": 2400, "リート系４": 200, "投信系１": 400}, "2023/08": {"リート系３": 200}, "2023/09": {"リート系１": 300}, "2023/10": {"リート系４": 400}, "2023/11": {"リート系３": 300}, "2023/12": {"鉄鋼系１": 11700, "精密系２": 2200, "エネルギー系２": 1500, "金融系１": 3100, "製造系１": 300, "金融系２": 2700, "リート系１": 300}, "2024/01": {"リート系４": 200, "投信系１": 400}, "2024/02": {"リート系３": 200}, "2024/03": {"リート系１": 300}, "2024/04": {"リート系４": 400}, "2024/05": {"リート系３": 300}, "2024/06": {"電機系２": 700, "鉄鋼系１": 12400, "金融系２": 2700, "リート系１": 300}, "2024/07": {"エネルギー系２": 1500, "金融系１": 3100, "リート系４": 200, "投信系１": 500}, "2024/08": {"リート系３": 200}, "2024/09": {"リート系１": 300}, "2024/10": {"リート系４": 400}, "2024/11": {"リート系３": 300}, "2024/12": {"エネルギー系２": 1900, "鉄鋼系１": 12900, "精密系２": 3700, "金融系１": 3700, "製造系１": 1000, "金融系２": 2900, "リート系１": 300}, "2025/01": {"リート系４": 200, "投信系１": 400}, "2025/02": {"リート系３": 300}, "2025/03": {"リート系１": 300}, "2025/04": {"リート系４": 400}, "2025/05": {"リート系３": 300}, "2025/06": {"鉄鋼系１": 13300, "金融系２": 2900, "リート系１": 300}, "2025/07": {"エネルギー系２": 1900, "金融系１": 5800, "リート系４": 200, "投信系１": 500}, "2025/08": {"リート系３": 200}, "2025/09": {"リート系１": 300}, "2025/10": {}, "2025/11": {}, "2025/12": {"鉄鋼系１": 13800, "エネルギー系２": 2600, "金融系１": 5100, "金融系２": 3200, "製造系１": 1900}, "2026/01": {"投信系１": 400}, "2026/02": {}, "2026/03": {}, "2026/04": {}, "2026/05": {}, "2026/06": {"電機系２": 1000, "鉄鋼系１": 16500, "金融系２": 3600}};
+const RAK_JPY_M={"2021/12": {}, "2022/01": {}, "2022/02": {}, "2022/03": {}, "2022/04": {}, "2022/05": {}, "2022/06": {"流通系１": 3400}, "2022/07": {}, "2022/08": {}, "2022/09": {}, "2022/10": {"流通系１": 3400}, "2022/11": {}, "2022/12": {}, "2023/01": {}, "2023/02": {}, "2023/03": {}, "2023/04": {}, "2023/05": {"流通系１": 3400}, "2023/06": {}, "2023/07": {}, "2023/08": {}, "2023/09": {}, "2023/10": {"流通系１": 3400, "小売系１": 1200}, "2023/11": {}, "2023/12": {}, "2024/01": {}, "2024/02": {}, "2024/03": {}, "2024/04": {}, "2024/05": {"流通系１": 3400}, "2024/06": {"通信系２": 400}, "2024/07": {}, "2024/08": {}, "2024/09": {}, "2024/10": {}, "2024/11": {}, "2024/12": {}, "2025/01": {}, "2025/02": {}, "2025/03": {}, "2025/04": {}, "2025/05": {"流通系１": 3400}, "2025/06": {"通信系２": 400, "商社系２": 100, "エネルギー系３": 0, "金融系３": 0}, "2025/07": {"投信系２": 1200, "投信系３": 200}, "2025/08": {}, "2025/09": {"輸送機系１": 12900, "住宅系１": 100, "サービス系１": 100}, "2025/10": {"サービス系１": 100}, "2025/11": {"通信系３": 500, "小売系２": 100}, "2025/12": {"鉄鋼系２": 3400, "商社系２": 100, "エネルギー系３": 0, "金融系３": 0}, "2026/01": {"投信系２": 300}, "2026/02": {}, "2026/03": {"輸送機系１": 3400, "日用品系１": 0}, "2026/04": {"住宅系１": 100, "サービス系１": 100}, "2026/05": {"小売系２": 100}, "2026/06": {"金融系４": 1900, "通信系３": 1400, "金融系３": 2200, "通信系２": 1400}};
+const RAK_USD_M={"2021/12": {"ETF米国２": 0.99, "ETF米国３": 0.36}, "2022/01": {"ETF米国１": 1.21}, "2022/02": {}, "2022/03": {"テック系米国１": 2.04, "ETF米国２": 1.73, "ETF米国３": 1.63}, "2022/04": {}, "2022/05": {"ETF米国１": 1.61}, "2022/06": {"テック系米国１": 2.04, "ETF米国２": 1.73, "ETF米国３": 1.02}, "2022/07": {}, "2022/08": {"ETF米国１": 1.97}, "2022/09": {"テック系米国１": 4.05, "ETF米国２": 1.77, "ETF米国３": 1.05}, "2022/10": {}, "2022/11": {"ETF米国１": 1.92}, "2022/12": {"テック系米国１": 4.06, "ETF米国２": 2.16, "ETF米国３": 1.27}, "2023/01": {"ETF米国１": 2.43}, "2023/02": {}, "2023/03": {"テック系米国１": 4.08, "ETF米国２": 1.87, "ETF米国３": 0.97}, "2023/04": {}, "2023/05": {"ETF米国１": 1.75}, "2023/06": {"テック系米国１": 4.08, "ETF米国２": 1.92, "ETF米国３": 1.17}, "2023/07": {}, "2023/08": {"ETF米国１": 1.87}, "2023/09": {"テック系米国１": 4.08, "ETF米国２": 1.92, "ETF米国３": 1.1}, "2023/10": {}, "2023/11": {"ETF米国１": 2.01}, "2023/12": {"テック系米国１": 4.08, "ETF米国２": 2.28, "ETF米国３": 1.34}, "2024/01": {"ETF米国１": 3.79}, "2024/02": {}, "2024/03": {"テック系米国１": 4.08, "ETF米国２": 1.9, "ETF米国３": 0.92}, "2024/04": {}, "2024/05": {"ETF米国１": 2.12}, "2024/06": {"テック系米国１": 4.11, "ETF米国２": 2.21, "ETF米国３": 1.22}, "2024/07": {}, "2024/08": {"ETF米国１": 2.8}, "2024/09": {"テック系米国１": 4.11, "ETF米国２": 2.07, "ETF米国３": 1.16}, "2024/10": {}, "2024/11": {"ETF米国１": 2.52}, "2024/12": {"テック系米国１": 4.11, "ETF米国２": 2.16, "ETF米国３": 1.36}, "2025/01": {"ETF米国１": 3.09}, "2025/02": {}, "2025/03": {"テック系米国１": 4.13}, "2025/04": {"ETF米国２": 2.31}, "2025/05": {"ETF米国１": 2.65}, "2025/06": {"テック系米国１": 4.13, "ETF米国３": 1.24}, "2025/07": {"ETF米国２": 2.16}, "2025/08": {"ETF米国１": 1.46}, "2025/09": {"テック系米国１": 4.11, "ETF米国２": 2.14, "ETF米国３": 1.22}, "2025/10": {"ETF米国２": 2.14}, "2025/11": {"ETF米国１": 1.73}, "2025/12": {"テック系米国１": 4.13, "ETF米国２": 2.19, "ETF米国３": 1.38}, "2026/01": {"ETF米国１": 1.95}, "2026/02": {}, "2026/03": {"テック系米国１": 4.13, "ETF米国２": 2.07, "ETF米国３": 1.8}, "2026/04": {"ETF米国２": 2.07}, "2026/05": {}, "2026/06": {"テック系米国１": 4.13}};
+const FROG_DIV_M={"2021/12": {}, "2022/01": {}, "2022/02": {}, "2022/03": {}, "2022/04": {}, "2022/05": {}, "2022/06": {"化学系２": 12, "銀行系１": 12, "金融系３": 20}, "2022/07": {"証券系２": 12, "海運系１": 15, "製薬系２": 19, "製造系２": 20}, "2022/08": {"住宅系２": 34, "電機系３": 17, "投信系４": 37}, "2022/09": {"銀行系１": 20, "住宅系３": 20, "輸送機系１": 17, "化学系２": 14}, "2022/10": {"サービス系３": 20, "サービス系２": 14}, "2022/11": {"小売系３": 12, "電機系４": 2}, "2022/12": {"銀行系１": 20, "卸売系１": 20, "金融系３": 20, "製造系２": 19, "食品系２": 24, "銀行系２": 15, "商社系３": 31, "素材系２": 41, "精密系２": 20}, "2023/01": {"リート系６": 17}, "2023/02": {"住宅系４": 17, "証券系２": 15}, "2023/03": {"輸送機系１": 20, "食品系２": 34, "銀行系１": 20}, "2023/04": {"住宅系３": 22, "化学系２": 70}, "2023/05": {"小売系３": 12, "サービス系２": 29}, "2023/06": {"海運系１": 109, "商社系３": 37, "海運系３": 68, "海運系２": 100, "証券系２": 82, "卸売系１": 29, "素材系２": 41, "金融系３": 20}, "2023/07": {"リート系６": 34, "証券系２": 12, "家電系１": 54, "リート系５": 73, "製薬系２": 19, "製造系２": 19, "食品系２": 15}, "2023/08": {"電機系３": 20, "投信系４": 29}, "2023/09": {"銀行系１": 31, "住宅系３": 20, "輸送機系１": 20, "住宅系２": 99, "化学系２": 70}, "2023/10": {"サービス系３": 42, "サービス系２": 29}, "2023/11": {"海運系２": 42, "小売系３": 32}, "2023/12": {"銀行系１": 31, "卸売系１": 22, "製造系２": 29, "金融系３": 20, "食品系２": 24, "銀行系２": 17, "商社系３": 42, "素材系２": 39}, "2024/01": {"住宅系４": 8, "証券系２": 15, "リート系６": 19}, "2024/02": {}, "2024/03": {"食品系２": 29, "輸送機系１": 20}, "2024/04": {"住宅系３": 22, "化学系２": 51}, "2024/05": {"アパレル系１": 56, "小売系３": 32, "サービス系２": 29}, "2024/06": {"食品系２": 24, "証券系２": 122, "金融系３": 20, "素材系２": 41, "銀行系２": 17, "卸売系１": 44, "海運系２": 42, "商社系３": 42}, "2024/07": {"住宅系４": 8, "リート系６": 19, "証券系２": 12, "家電系１": 99, "製薬系２": 20, "製造系２": 27, "海運系１": 136, "海運系２": 42}, "2024/08": {"電機系３": 20, "投信系４": 32}, "2024/09": {"銀行系１": 17, "住宅系３": 22, "輸送機系１": 20, "住宅系２": 105, "化学系２": 83}, "2024/10": {"サービス系２": 29, "サービス系３": 44}, "2024/11": {"小売系３": 32}, "2024/12": {"銀行系１": 17, "卸売系１": 44, "製造系２": 27, "金融系３": 20, "食品系２": 24, "銀行系２": 20, "商社系３": 49, "素材系２": 44, "海運系２": 70}, "2025/01": {"証券系２": 17, "リート系６": 22, "住宅系４": 8}, "2025/02": {}, "2025/03": {"食品系２": 29, "輸送機系１": 20, "銀行系１": 17}, "2025/04": {"住宅系３": 27, "化学系２": 83}, "2025/05": {"アパレル系１": 71, "小売系３": 36, "サービス系２": 56}, "2025/06": {"海運系１": 235, "商社系３": 49, "海運系３": 78, "証券系２": 122, "卸売系１": 51, "素材系２": 44, "金融系３": 20, "銀行系２": 26}, "2025/07": {"住宅系４": 10, "リート系６": 29, "証券系２": 17, "家電系１": 99, "製薬系２": 20, "製造系２": 29, "食品系２": 24, "海運系２": 70}, "2025/08": {"電機系３": 22, "投信系４": 37}, "2025/09": {"銀行系１": 20, "住宅系３": 26, "輸送機系１": 20, "住宅系２": 109, "化学系２": 83}, "2025/10": {"サービス系２": 63, "サービス系３": 63}, "2025/11": {"アパレル系１": 37, "小売系３": 46}, "2025/12": {"銀行系１": 20, "卸売系１": 49, "製造系２": 37, "金融系３": 20, "食品系２": 20, "銀行系２": 32, "商社系３": 54, "素材系２": 46, "海運系２": 32}, "2026/01": {"証券系２": 19, "リート系６": 22, "住宅系４": 8}, "2026/02": {}, "2026/03": {"食品系２": 39, "化学系２": 248, "輸送機系１": 8, "銀行系１": 20}, "2026/04": {"住宅系３": 29, "化学系２": 83}, "2026/05": {"小売系３": 53}, "2026/06": {"海運系１": 221, "証券系２": 202, "卸売系１": 49, "素材系２": 56, "銀行系２": 44, "海運系２": 49, "金融系３": 20}};
+const FROG_PT_M={"2021/12": 0, "2022/01": 0, "2022/02": 0, "2022/03": 11000, "2022/04": 5100, "2022/05": 8500, "2022/06": 2600, "2022/07": 5100, "2022/08": 7600, "2022/09": 7600, "2022/10": 1700, "2022/11": 800, "2022/12": 5100, "2023/01": 8500, "2023/02": 0, "2023/03": 19000, "2023/04": 2600, "2023/05": 800, "2023/06": 1200, "2023/07": 200, "2023/08": 800, "2023/09": 0, "2023/10": 800, "2023/11": 800, "2023/12": 1700, "2024/01": 1700, "2024/02": 2600, "2024/03": 1700, "2024/04": 0, "2024/05": 1700, "2024/06": 0, "2024/07": 800, "2024/08": 800, "2024/09": 0, "2024/10": 1700, "2024/11": 800, "2024/12": 1700, "2025/01": 800, "2025/02": 3400, "2025/03": 800, "2025/04": 800, "2025/05": 3400, "2025/06": 2600, "2025/07": 2600, "2025/08": 1700, "2025/09": 800, "2025/10": 800, "2025/11": 800, "2025/12": 800, "2026/01": 0, "2026/02": 800, "2026/03": 3400, "2026/04": 800, "2026/05": 1700, "2026/06": 800};
+const RANK_SBI_DIST=[{"n": "製薬系１", "v": 94000}, {"n": "商社系１", "v": 54400}, {"n": "素材系１", "v": 36900}, {"n": "食品系１", "v": 22400}, {"n": "物流系１", "v": 21400}, {"n": "不動産系１", "v": 14400}, {"n": "工業系１", "v": 11000}, {"n": "建設系１", "v": 10500}, {"n": "電機系１", "v": 5400}, {"n": "物産系１", "v": 4600}, {"n": "化学系１", "v": 2700}, {"n": "テック系１", "v": 2400}, {"n": "精密系１", "v": 2400}, {"n": "金融系１", "v": 1900}, {"n": "エネルギー系１", "v": 1500}];
+const RANK_SBI_DIV=[{"n": "鉄鋼系１", "v": 113000}, {"n": "金融系１", "v": 27500}, {"n": "金融系２", "v": 25200}, {"n": "エネルギー系２", "v": 13900}, {"n": "精密系２", "v": 8800}, {"n": "リート系１", "v": 4200}, {"n": "電機系２", "v": 3900}, {"n": "リート系３", "v": 3600}, {"n": "製造系１", "v": 3600}, {"n": "投信系１", "v": 3200}, {"n": "リート系４", "v": 2800}, {"n": "教育系１", "v": 1900}, {"n": "リート系２", "v": 1000}];
+const RANK_RAK_JPY=[{"n": "流通系１", "v": 20400}, {"n": "輸送機系１", "v": 16300}, {"n": "鉄鋼系２", "v": 3400}, {"n": "通信系２", "v": 2200}, {"n": "金融系３", "v": 2200}, {"n": "金融系４", "v": 1900}, {"n": "通信系３", "v": 1800}, {"n": "投信系２", "v": 1500}, {"n": "小売系１", "v": 1200}, {"n": "住宅系１", "v": 200}, {"n": "投信系３", "v": 200}, {"n": "サービス系１", "v": 200}, {"n": "商社系２", "v": 200}, {"n": "小売系２", "v": 100}, {"n": "エネルギー系３", "v": 100}, {"n": "日用品系１", "v": 0}];
+const RANK_RAK_USD=[{"n": "テック系米国１", "v": 69.7}, {"n": "ETF米国２", "v": 39.81}, {"n": "ETF米国１", "v": 36.91}, {"n": "ETF米国３", "v": 20.23}];
+const RANK_FROG=[{"n": "化学系２", "v": 797}, {"n": "海運系１", "v": 716}, {"n": "証券系２", "v": 648}, {"n": "海運系２", "v": 449}, {"n": "素材系２", "v": 352}, {"n": "住宅系２", "v": 347}, {"n": "卸売系１", "v": 309}, {"n": "商社系３", "v": 306}, {"n": "食品系２", "v": 286}, {"n": "小売系３", "v": 255}, {"n": "家電系１", "v": 252}, {"n": "サービス系２", "v": 248}, {"n": "銀行系１", "v": 246}, {"n": "製造系２", "v": 207}, {"n": "住宅系３", "v": 189}, {"n": "金融系３", "v": 184}, {"n": "銀行系２", "v": 172}, {"n": "サービス系３", "v": 170}, {"n": "アパレル系１", "v": 165}, {"n": "リート系６", "v": 162}, {"n": "輸送機系１", "v": 148}, {"n": "海運系３", "v": 146}, {"n": "投信系４", "v": 136}, {"n": "電機系３", "v": 80}, {"n": "製薬系２", "v": 78}, {"n": "リート系５", "v": 73}, {"n": "住宅系４", "v": 61}, {"n": "精密系２", "v": 20}, {"n": "電機系４", "v": 2}];
+// ── ユーティリティ ──────────────────────────────
+const C={c1:'#f6ad55',c2:'#4fd1c5',c3:'#f687b3',c4:'#68d391',c5:'#86efac',c6:'#fbbf24',tot:'#a78bfa',grid:'#2a3050',text:'#7888a4'};
+Chart.defaults.color=C.text;
+Chart.defaults.font.family="'DM Mono',monospace";
+Chart.defaults.font.size=11;
+function sumObj(o){return Object.values(o||{}).reduce((a,b)=>a+b,0);}
+function fmt(v,usd=false){return usd?`$${v.toFixed(2)}`:`¥${Math.round(v).toLocaleString()}`;}
+function destroyChart(id){const el=document.getElementById(id);if(el){const c=Chart.getChart(el);if(c)c.destroy();}}
+const tipBase={backgroundColor:'#1e2436',borderColor:'#2a3050',borderWidth:1,titleColor:'#e2e8f0',bodyColor:'#7888a4',padding:10};
+const tipY={...tipBase,callbacks:{label:ctx=>` ${fmt(ctx.parsed.y)}`}};
+function rankHTML(items,color,usd=false,maxV=null){
+  const mv=maxV??Math.max(...items.map(x=>x.v),1);
+  return items.filter(x=>x.v>0).map(x=>`<div class="ri"><div class="rn" title="${x.n}">${x.n}</div><div class="rb-wrap"><div class="rb" style="width:${(x.v/mv*100).toFixed(1)}%;background:${color}"></div></div><div class="rv">${fmt(x.v,usd)}</div></div>`).join('');
+}
+
+// ── フィルター状態 ──────────────────────────────
+let curYear='all', curMonth='all';
+
+function filteredMonths(){
+  let m=MONTHS;
+  if(curYear!=='all') m=m.filter(ym=>ym.startsWith(curYear));
+  if(curMonth!=='all') m=m.filter(ym=>ym.slice(5)===curMonth);
+  return m;
+}
+function filteredYears(){
+  return curYear!=='all'?[curYear]:YEARS;
+}
+function filteredSum(map){return filteredMonths().reduce((s,ym)=>s+sumObj(map[ym]),0);}
+function filterLabel(){
+  if(curYear==='all') return '累計';
+  if(curMonth==='all') return curYear+'年';
+  return curYear+'年'+parseInt(curMonth)+'月';
+}
+
+function setYearFilter(year,el){
+  curYear=year; curMonth='all';
+  document.querySelectorAll('.filter-inner:first-child .fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const row=document.getElementById('monthFilterRow');
+  const btns=document.getElementById('monthBtns');
+  document.getElementById('fm-all').classList.add('active');
+  if(year==='all'){
+    row.style.display='none';
+  } else {
+    const mons=MONTHS.filter(ym=>ym.startsWith(year)&&(sumObj(SBI_DIST_M[ym])+sumObj(SBI_DIV_M[ym])+sumObj(RAK_JPY_M[ym])+sumObj(FROG_DIV_M[ym]))>0);
+    btns.innerHTML=mons.map(ym=>`<button class="fbtn" onclick="setMonthFilter('${ym.slice(5)}',this)">${parseInt(ym.slice(5))}月</button>`).join('');
+    row.style.display='flex';
+  }
+  refreshAll();
+}
+
+function setMonthFilter(month,el){
+  curMonth=month;
+  document.querySelectorAll('#monthFilterRow .fbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  refreshAll();
+}
+
+let chartsInited={};
+function refreshAll(){
+  ['ovYearChart','ovMonthChart','sbiYearChart','sbiMonthChart','rakYearChart','rakMonthChart','frogYearChart','frogMonthChart'].forEach(destroyChart);
+  Object.keys(chartsInited).forEach(k=>chartsInited[k]=false);
+  const active=document.querySelector('.page.active');
+  if(active){const name=active.id.replace('page-','');initPage(name);chartsInited[name]=true;}
+}
+
+// ── ページ切替 ──────────────────────────────────
+function showPage(name,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  el.classList.add('active');
+  if(!chartsInited[name]){initPage(name);chartsInited[name]=true;}
+}
+function initPage(name){
+  if(name==='overview') initOverview();
+  else if(name==='sbi') initSbi();
+  else if(name==='rakuten') initRakuten();
+  else if(name==='froggy') initFroggy();
+}
+
+// ── KPI更新 ────────────────────────────────────
+function updateKpis(){
+  const s1=filteredSum(SBI_DIST_M),s2=filteredSum(SBI_DIV_M);
+  const r1=filteredSum(RAK_JPY_M),r2=filteredSum(RAK_USD_M);
+  const f1=filteredSum(FROG_DIV_M);
+  const fp=filteredMonths().reduce((s,ym)=>s+(FROG_PT_M[ym]||0),0);
+  const tot=s1+s2+r1+f1;
+  const lbl=filterLabel();
+
+  const ov=document.getElementById('ovKpiRow');
+  if(ov) ov.innerHTML=`
+    <div class="kpi" style="--kc:var(--c1)"><div class="kpi-label">SBI 配当（貸株外）${lbl}</div><div class="kpi-value">¥${s1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c2)"><div class="kpi-label">SBI 配当相当額（貸株中）${lbl}</div><div class="kpi-value">¥${s2.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c3)"><div class="kpi-label">楽天 配当（円）${lbl}</div><div class="kpi-value">¥${r1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c5)"><div class="kpi-label">フロッギー 配当${lbl}</div><div class="kpi-value">¥${f1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--total)"><div class="kpi-label">円建て合計 ${lbl}</div><div class="kpi-value">¥${tot.toLocaleString()}</div><div class="kpi-note">+ $${r2.toFixed(2)}（楽天ドル）</div></div>`;
+
+  const sb=document.getElementById('sbiKpiRow');
+  if(sb) sb.innerHTML=`
+    <div class="kpi" style="--kc:var(--c1)"><div class="kpi-label">配当金（貸株外）${lbl}</div><div class="kpi-value">¥${s1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c2)"><div class="kpi-label">配当金相当額（貸株中）${lbl}</div><div class="kpi-value">¥${s2.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--total)"><div class="kpi-label">SBI合計 ${lbl}</div><div class="kpi-value">¥${(s1+s2).toLocaleString()}</div></div>`;
+
+  const rk=document.getElementById('rakKpiRow');
+  if(rk) rk.innerHTML=`
+    <div class="kpi" style="--kc:var(--c3)"><div class="kpi-label">配当金（円建て）${lbl}</div><div class="kpi-value">¥${r1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c4)"><div class="kpi-label">配当金（ドル建て）${lbl}</div><div class="kpi-value">$${r2.toFixed(2)}</div></div>
+    <div class="kpi" style="--kc:var(--c3)"><div class="kpi-label">NISA口座中心</div><div class="kpi-value" style="font-size:16px">成長投資枠</div></div>`;
+
+  const fg=document.getElementById('frogKpiRow');
+  if(fg){
+    const yld=fp>0?(f1/fp*100).toFixed(1):'—';
+    fg.innerHTML=`
+    <div class="kpi" style="--kc:var(--c5)"><div class="kpi-label">🐸 配当金 ${lbl}</div><div class="kpi-value">¥${f1.toLocaleString()}</div></div>
+    <div class="kpi" style="--kc:var(--c6)"><div class="kpi-label">投入ポイント ${lbl}</div><div class="kpi-value">${fp.toLocaleString()}<span class="kpi-unit">pt</span></div></div>
+    <div class="kpi" style="--kc:#94a3b8"><div class="kpi-label">配当利回り（${lbl}）</div><div class="kpi-value">${yld}<span class="kpi-unit">%</span></div></div>
+    <div class="kpi" style="--kc:#c084fc"><div class="kpi-label">保有銘柄数</div><div class="kpi-value">87<span class="kpi-unit">銘柄</span></div></div>`;
+  }
+}
+
+// ── 月別明細（1ヶ月選択時のみ概要に表示） ──────
+function renderMonthDetail(){
+  const el=document.getElementById('ovMonthDetail');
+  if(!el) return;
+  const mons=filteredMonths();
+  if(mons.length!==1){el.innerHTML='';return;}
+  const ym=mons[0];
+  const srcs=[
+    {label:'SBI 配当（貸株外）',data:SBI_DIST_M[ym],color:C.c1,badge:'SBI'},
+    {label:'SBI 配当相当額（貸株中）',data:SBI_DIV_M[ym],color:C.c2,badge:'SBI'},
+    {label:'楽天 配当（円）',data:RAK_JPY_M[ym],color:C.c3,badge:'楽天'},
+    {label:'楽天 配当（ドル）',data:RAK_USD_M[ym],color:C.c4,badge:'楽天',usd:true},
+    {label:'フロッギー 配当',data:FROG_DIV_M[ym],color:C.c5,badge:'🐸'},
+  ];
+  let html=`<div class="month-detail-title">📋 ${ym} 銘柄別明細</div><div class="source-cards">`;
+  srcs.forEach(src=>{
+    const items=Object.entries(src.data||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+    if(!items.length) return;
+    const tot=items.reduce((a,[,v])=>a+v,0);
+    html+=`<div class="source-card">
+      <div class="sc-header"><span class="sc-badge" style="background:${src.color}22;color:${src.color};border:1px solid ${src.color}44">${src.badge}</span><span style="font-size:11px;color:var(--muted)">${src.label}</span></div>
+      <div class="sc-total" style="color:${src.color}">${fmt(tot,src.usd||false)}</div>
+      <div class="sc-items">${items.map(([n,v])=>`<div class="sc-item"><span class="sc-item-name" title="${n}">${n}</span><span class="sc-item-val" style="color:${src.color}">${fmt(v,src.usd||false)}</span></div>`).join('')}</div>
+    </div>`;
+  });
+  el.innerHTML=html+'</div>';
+}
+
+// ── 概要 ────────────────────────────────────────
+function initOverview(){
+  updateKpis();
+  renderMonthDetail();
+  const yrs=filteredYears();
+  const mons=filteredMonths();
+  document.getElementById('ovYearSub').textContent=curYear==='all'?'2021–2026':curYear+'年';
+
+  // 年別（1年選択時は月別のみ表示、年別は非表示）
+  const yearCard=document.querySelector('#page-overview .card:nth-child(2)');
+  if(yrs.length<=1 && curYear!=='all'){
+    yearCard.style.display='none';
+  } else {
+    yearCard.style.display='';
+    destroyChart('ovYearChart');
+    new Chart(document.getElementById('ovYearChart'),{
+      type:'bar',data:{labels:yrs,datasets:[
+        {label:'SBI 配当外',data:yrs.map(y=>YEAR_DATA[y].sbi_dist),backgroundColor:C.c1+'cc',borderRadius:3,borderSkipped:false},
+        {label:'SBI 貸株中',data:yrs.map(y=>YEAR_DATA[y].sbi_div),backgroundColor:C.c2+'cc',borderRadius:3,borderSkipped:false},
+        {label:'楽天 円',data:yrs.map(y=>YEAR_DATA[y].rak_jpy),backgroundColor:C.c3+'cc',borderRadius:3,borderSkipped:false},
+        {label:'フロッギー',data:yrs.map(y=>YEAR_DATA[y].frog_div),backgroundColor:C.c5+'cc',borderRadius:3,borderSkipped:false},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+        scales:{x:{stacked:true,grid:{color:C.grid}},y:{stacked:true,grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+    });
+  }
+
+  // 月別
+  const totals=mons.map(ym=>sumObj(SBI_DIST_M[ym])+sumObj(SBI_DIV_M[ym])+sumObj(RAK_JPY_M[ym])+sumObj(FROG_DIV_M[ym]));
+  const combinedTip={...tipBase,callbacks:{
+    title:i=>i[0].label,
+    afterBody:i=>{
+      const idx=i[0].dataIndex; const ym=mons[idx];
+      const lines=[];
+      const s1=Object.entries(SBI_DIST_M[ym]||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+      const s2=Object.entries(SBI_DIV_M[ym]||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+      const r1=Object.entries(RAK_JPY_M[ym]||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+      const f1=Object.entries(FROG_DIV_M[ym]||{}).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
+      if(s1.length)lines.push('SBI配当外',...s1.map(([n,v])=>`  ${n} ¥${v.toLocaleString()}`));
+      if(s2.length)lines.push('SBI貸株中',...s2.map(([n,v])=>`  ${n} ¥${v.toLocaleString()}`));
+      if(r1.length)lines.push('楽天円',...r1.map(([n,v])=>`  ${n} ¥${v.toLocaleString()}`));
+      if(f1.length)lines.push('フロッギー',...f1.slice(0,5).map(([n,v])=>`  ${n} ¥${v.toLocaleString()}`));
+      lines.push(`合計 ¥${totals[idx].toLocaleString()}`);
+      return lines;
+    },label:()=>null
+  }};
+  destroyChart('ovMonthChart');
+  new Chart(document.getElementById('ovMonthChart'),{
+    type:'bar',data:{labels:mons,datasets:[{label:'月別合計',data:totals,backgroundColor:C.tot+'99',borderRadius:2,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:combinedTip},
+      scales:{x:{grid:{color:C.grid},ticks:{maxTicksLimit:12,maxRotation:45}},y:{grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+  });
+}
+
+// ── SBI ─────────────────────────────────────────
+function initSbi(){
+  updateKpis();
+  const yrs=filteredYears(); const mons=filteredMonths();
+  destroyChart('sbiYearChart');
+  new Chart(document.getElementById('sbiYearChart'),{
+    type:'bar',data:{labels:yrs,datasets:[
+      {label:'配当外',data:yrs.map(y=>YEAR_DATA[y].sbi_dist),backgroundColor:C.c1+'cc',borderRadius:3,borderSkipped:false},
+      {label:'貸株中',data:yrs.map(y=>YEAR_DATA[y].sbi_div),backgroundColor:C.c2+'cc',borderRadius:3,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+      scales:{x:{stacked:true,grid:{color:C.grid}},y:{stacked:true,grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+  });
+  destroyChart('sbiMonthChart');
+  new Chart(document.getElementById('sbiMonthChart'),{
+    type:'bar',data:{labels:mons,datasets:[
+      {label:'配当外',data:mons.map(ym=>sumObj(SBI_DIST_M[ym])),backgroundColor:C.c1+'cc',borderRadius:2,borderSkipped:false},
+      {label:'貸株中',data:mons.map(ym=>sumObj(SBI_DIV_M[ym])),backgroundColor:C.c2+'cc',borderRadius:2,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+      scales:{x:{stacked:true,grid:{color:C.grid},ticks:{maxTicksLimit:12,maxRotation:45}},y:{stacked:true,grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+  });
+  // 銘柄ランキング（フィルター対応）
+  function filteredRank(monthMap){
+    const t={};
+    filteredMonths().forEach(ym=>Object.entries(monthMap[ym]||{}).forEach(([n,v])=>{t[n]=(t[n]||0)+v;}));
+    return Object.entries(t).map(([n,v])=>({n,v})).sort((a,b)=>b.v-a.v);
+  }
+  document.getElementById('rSbiDist').innerHTML=rankHTML(filteredRank(SBI_DIST_M),C.c1);
+  document.getElementById('rSbiDiv').innerHTML=rankHTML(filteredRank(SBI_DIV_M),C.c2);
+}
+
+// ── 楽天 ─────────────────────────────────────────
+function initRakuten(){
+  updateKpis();
+  const yrs=filteredYears(); const mons=filteredMonths();
+  destroyChart('rakYearChart');
+  new Chart(document.getElementById('rakYearChart'),{
+    type:'bar',data:{labels:yrs,datasets:[
+      {label:'円',data:yrs.map(y=>YEAR_DATA[y].rak_jpy),backgroundColor:C.c3+'cc',borderRadius:3,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+      scales:{x:{grid:{color:C.grid}},y:{grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+  });
+  destroyChart('rakMonthChart');
+  new Chart(document.getElementById('rakMonthChart'),{
+    type:'bar',data:{labels:mons,datasets:[
+      {label:'円',data:mons.map(ym=>sumObj(RAK_JPY_M[ym])),backgroundColor:C.c3+'cc',borderRadius:2,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+      scales:{x:{grid:{color:C.grid},ticks:{maxTicksLimit:12,maxRotation:45}},y:{grid:{color:C.grid},ticks:{callback:v=>'¥'+v}}}}
+  });
+  function filteredRank(monthMap,usd=false){
+    const t={};
+    filteredMonths().forEach(ym=>Object.entries(monthMap[ym]||{}).forEach(([n,v])=>{t[n]=(t[n]||0)+v;}));
+    return Object.entries(t).map(([n,v])=>({n,v:usd?Math.round(v*100)/100:Math.round(v)})).sort((a,b)=>b.v-a.v);
+  }
+  document.getElementById('rRakJpy').innerHTML=rankHTML(filteredRank(RAK_JPY_M),C.c3);
+  document.getElementById('rRakUsd').innerHTML=rankHTML(filteredRank(RAK_USD_M,true),C.c4,true);
+}
+
+// ── フロッギー ───────────────────────────────────
+function initFroggy(){
+  updateKpis();
+  const yrs=filteredYears().filter(y=>y!=='2021');
+  const mons=filteredMonths();
+  destroyChart('frogYearChart');
+  if(yrs.length>0){
+    new Chart(document.getElementById('frogYearChart'),{
+      type:'bar',data:{labels:yrs,datasets:[
+        {label:'ポイント投入',data:yrs.map(y=>YEAR_DATA[y].frog_pt),backgroundColor:C.c6+'33',borderColor:C.c6,borderWidth:1,borderRadius:3,borderSkipped:false},
+        {label:'配当',data:yrs.map(y=>YEAR_DATA[y].frog_div),backgroundColor:C.c5+'cc',borderRadius:3,borderSkipped:false},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+        scales:{x:{grid:{color:C.grid}},y:{grid:{color:C.grid},ticks:{callback:v=>'¥'+(v/1000).toFixed(0)+'k'}}}}
+    });
+  }
+  destroyChart('frogMonthChart');
+  new Chart(document.getElementById('frogMonthChart'),{
+    type:'bar',data:{labels:mons,datasets:[
+      {label:'配当',data:mons.map(ym=>sumObj(FROG_DIV_M[ym])),backgroundColor:C.c5+'cc',borderRadius:2,borderSkipped:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:tipY},
+      scales:{x:{grid:{color:C.grid},ticks:{maxTicksLimit:12,maxRotation:45}},y:{grid:{color:C.grid},ticks:{callback:v=>'¥'+v}}}}
+  });
+  // 銘柄ランキング（フィルター対応）
+  const t={};
+  filteredMonths().forEach(ym=>Object.entries(FROG_DIV_M[ym]||{}).forEach(([n,v])=>{t[n]=(t[n]||0)+v;}));
+  const ranked=Object.entries(t).map(([n,v])=>({n,v:Math.round(v)})).sort((a,b)=>b.v-a.v).slice(0,20);
+  const mv=ranked[0]?.v??1;
+  const half=Math.ceil(ranked.length/2);
+  document.getElementById('rFrog1').innerHTML=rankHTML(ranked.slice(0,half),C.c5,false,mv);
+  document.getElementById('rFrog2').innerHTML=rankHTML(ranked.slice(half),C.c5,false,mv);
+}
+
+// ── 起動 ────────────────────────────────────────
+initPage('overview');
+chartsInited['overview']=true;
+</script>
+</body>
+</html>
