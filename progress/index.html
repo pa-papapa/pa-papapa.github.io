@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>プロジェクト進捗マップ — pa-papapa</title>
+<style>
+  :root {
+    --bg: #0f0f11;
+    --bg2: #17171a;
+    --bg3: #1e1e23;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.14);
+    --text: #e8e6e0;
+    --text2: #9a9890;
+    --text3: #5a5856;
+    --accent: #7F77DD;
+    --today: rgba(127,119,221,0.18);
+
+    --c-movie:  #7F77DD;
+    --c-app:    #1D9E75;
+    --c-stock:  #BA7517;
+    --c-job:    #D85A30;
+    --c-site:   #D4537E;
+    --c-tool:   #3B8BD4;
+    --c-learn:  #639922;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+    padding: 2rem 1.5rem 4rem;
+  }
+  .page-header {
+    max-width: 900px;
+    margin: 0 auto 2.5rem;
+    border-bottom: .5px solid var(--border2);
+    padding-bottom: 1.25rem;
+  }
+  .page-header h1 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .page-header p {
+    font-size: 13px;
+    color: var(--text2);
+    margin-top: 4px;
+  }
+  .kpi-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .kpi {
+    background: var(--bg2);
+    border: .5px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 18px;
+    min-width: 110px;
+  }
+  .kpi .n { font-size: 20px; font-weight: 500; color: var(--text); }
+  .kpi .l { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    max-width: 900px;
+    margin: 0 auto 1.5rem;
+  }
+  .leg { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); }
+  .ld { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  .gantt-outer {
+    max-width: 900px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  table.gantt {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 660px;
+  }
+  .gantt thead th {
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text3);
+    text-align: center;
+    padding: 4px 2px 6px;
+    border-bottom: .5px solid var(--border2);
+    white-space: nowrap;
+    letter-spacing: .04em;
+  }
+  .gantt thead th.month-start {
+    border-left: .5px solid var(--border2);
+    color: var(--text2);
+    font-size: 11px;
+  }
+
+  /* section header rows */
+  .gantt tr.section-row td {
+    padding: 16px 0 4px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: .5px solid var(--border);
+    padding-left: 10px;
+  }
+  .gantt tr.section-row td.has-color {
+    border-left: 3px solid var(--s-color);
+    color: var(--s-color);
+    opacity: 0.75;
+  }
+
+  /* data rows */
+  .gantt tr.data-row { cursor: pointer; }
+  .gantt tr.data-row td {
+    border-bottom: .5px solid var(--border);
+    vertical-align: middle;
+  }
+  .gantt tr.data-row:hover td { background: rgba(255,255,255,0.025); }
+
+  td.row-label {
+    padding: 6px 10px 6px 10px;
+    min-width: 155px;
+    max-width: 170px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-left: 3px solid transparent;
+  }
+  td.row-label .title {
+    font-size: 12px;
+    color: var(--text);
+    font-weight: 500;
+  }
+  td.row-label .sub {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+
+  td.cell {
+    padding: 5px 1px;
+    min-width: 28px;
+    vertical-align: middle;
+  }
+  td.cell.month-start { border-left: .5px solid var(--border); }
+  td.cell.today-col { background: var(--today); }
+
+  .bar {
+    height: 12px;
+    border-radius: 3px;
+    width: 100%;
+  }
+  .bar.done  { opacity: 1; }
+  .bar.doing { opacity: 1; background-image: repeating-linear-gradient(90deg, transparent, transparent 4px, rgba(255,255,255,0.12) 4px, rgba(255,255,255,0.12) 5px); }
+  .bar.todo  { opacity: 0.28; }
+
+  /* overlay */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  .overlay.open { display: flex; }
+
+  /* popup */
+  .popup {
+    background: var(--bg2);
+    border: .5px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 520px;
+    position: relative;
+    animation: pop-in 0.18s ease;
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.95) translateY(8px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .popup-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none;
+    border: none;
+    color: var(--text3);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.15s;
+  }
+  .popup-close:hover { color: var(--text); }
+  .d-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-right: 24px;
+  }
+  .d-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .d-body {
+    color: var(--text2);
+    line-height: 1.75;
+    font-size: 13px;
+  }
+  .d-status {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 99px;
+    font-weight: 500;
+  }
+  .d-status.done  { background: rgba(99,153,34,0.18);  color: #97C459; }
+  .d-status.doing { background: rgba(127,119,221,0.18); color: #AFA9EC; }
+  .d-status.todo  { background: rgba(90,88,86,0.25);    color: #888780; }
+  .d-status.multi { background: rgba(186,117,23,0.18);  color: #FAC775; }
+
+  .today-note {
+    max-width: 900px;
+    margin: 10px auto 0;
+    font-size: 11px;
+    color: var(--text3);
+  }
+  .today-note span {
+    display: inline-block;
+    width: 10px; height: 2px;
+    background: var(--accent);
+    vertical-align: middle;
+    margin-right: 4px;
+    opacity: 0.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>プロジェクト進捗マップ</h1>
+  <p>2026年5月〜2027年1月　全7プロジェクト · 最終更新 2026年6月13日</p>
+</div>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="n">7</div><div class="l">進行中プロジェクト</div></div>
+  <div class="kpi"><div class="n">4</div><div class="l">公開中 URL</div></div>
+  <div class="kpi"><div class="n">5</div><div class="l">カテゴリ</div></div>
+  <div class="kpi"><div class="n">2027.1</div><div class="l">目標目安</div></div>
+</div>
+
+<div class="legend">
+  <div class="leg"><span class="ld" style="background:var(--c-movie)"></span>映画データ分析</div>
+  <div class="leg"><span class="ld" style="background:var(--c-app)"></span>アプリ開発</div>
+  <div class="leg"><span class="ld" style="background:var(--c-tool)"></span>業務ツール開発</div>
+  <div class="leg"><span class="ld" style="background:var(--c-stock)"></span>株・資産管理</div>
+  <div class="leg"><span class="ld" style="background:var(--c-job)"></span>書類・面接準備</div>
+  <div class="leg"><span class="ld" style="background:var(--c-learn)"></span>スキル学習</div>
+  <div class="leg"><span class="ld" style="background:var(--c-site)"></span>ポートフォリオ</div>
+  <div class="leg" style="margin-left:8px"><span class="ld" style="background:#888;opacity:.4"></span>予定（薄色）</div>
+  <div class="leg"><span class="ld" style="background:var(--c-movie);background-image:repeating-linear-gradient(90deg,transparent,transparent 4px,rgba(255,255,255,.2) 4px,rgba(255,255,255,.2) 5px)"></span>進行中（ストライプ）</div>
+</div>
+
+<div class="gantt-outer">
+<table class="gantt" id="gantt"></table>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="popup" id="popup">
+    <button class="popup-close" id="popup-close" aria-label="閉じる">&times;</button>
+    <div class="d-title"><span class="d-dot" id="d-dot"></span><span id="d-title"></span></div>
+    <div class="d-body" id="d-body"></div>
+    <span class="d-status" id="d-status"></span>
+  </div>
+</div>
+
+<div class="today-note"><span></span>縦の薄い紫ハイライト = 今日（2026年6月13日）　各行をクリックすると詳細ポップアップを表示 / ESCまたは背景クリックで閉じる</div>
+
+<script>
+const TOTAL = 34;
+const TODAY = 5;
+const MONTH_STARTS = [0,4,8,12,16,20,24,28,32];
+const MONTH_LABELS = ['5月','6月','7月','8月','9月','10月','11月','12月','1月'];
+const MONTH_COLS   = [4,4,4,4,4,4,4,4,2];
+
+const C = {
+  movie:'#7F77DD', app:'#1D9E75', tool:'#3B8BD4',
+  stock:'#BA7517', job:'#D85A30', learn:'#639922', site:'#D4537E'
+};
+
+const rows = [
+  {type:'section', label:'Tableau public', color:C.movie},
+  {
+    id:'tableau-learn',
+    label:'Tableau学習', sub:'全8レッスン・1本目DB作成',
+    color:C.movie, bars:[{s:0,e:8,st:'done'}],
+    status:'done',
+    detail:'Tableau全8レッスンを完走。日本映画市場分析ダッシュボード（2000年以降）を作成・保存済み。邦画・洋画の公開本数推移、入場者数、興行収入の3指標をシート2枚＋ダッシュボード1枚で構成。1999年以前と2000年以降でデータ定義が異なる「2000年問題」も解決済み。'
+  },
+  {
+    id:'tableau-publish',
+    label:'1本目 DB 公開仕上げ', sub:'ツールヒント・色統一・Tableau Public公開',
+    color:C.movie, bars:[{s:5,e:10,st:'doing'}],
+    status:'doing',
+    detail:'フェーズ2の中心タスク。ツールヒントの整備、色の統一、最終レイアウト調整を経てTableau Publicで一般公開予定。公開後、ポートフォリオサイト（Cumhra Leoithne）の「Data」セクションに追加する。'
+  },
+  {
+    id:'tableau-2nd',
+    label:'2本目 DB（配信市場）', sub:'映画選択行動と配信市場テーマ',
+    color:C.movie, bars:[{s:8,e:16,st:'todo'}],
+    status:'todo',
+    detail:'フェーズ3（7〜9月）で着手予定。テーマは「映画選択行動と配信市場」。SQL学習と並行して進める。整骨院の財務データを使ったレポートも同時期に作成予定。'
+  },
+
+  {type:'section', label:'アプリ開発', color:C.app},
+  {
+    id:'cinema-select',
+    label:'Cinema Select', sub:'映画ガチャWebアプリ・公開済み',
+    color:C.app, bars:[{s:0,e:6,st:'done'}],
+    status:'done',
+    detail:'気分や好みから映画をランダム提案するWebアプリ。BIG SCREEN（大作・気分別）とミニシアター（地域・スタイル別）の2軸11カテゴリ構成。フィルムロールUI・テーマ切り替え・お気に入り保存（LocalStorage）を実装。公開先: https://pa-papapa.github.io/cinema-select/'
+  },
+  {
+    id:'movico',
+    label:'MOVICO', sub:'現在地から映画館を案内するアプリ',
+    color:C.app, bars:[{s:3,e:7,st:'done'},{s:7,e:14,st:'doing'}],
+    status:'multi',
+    detail:'「wander into a film」をコンセプトに、GPSで現在地を取得し半径5km以内の映画館をGoogle Places APIで自動取得。TMDB APIで公開中の映画をポスター付き表示。HTTPS化・お気に入り映画館・シャッフル機能を実装済み。次のステップはCloudflare WorkersへのClaude API組み込み（上映スケジュール検索機能）。公開先: https://movico-moviego.com'
+  },
+  {
+    id:'seikotsu',
+    label:'整骨院 予約管理アプリ', sub:'家業のデジタル化・フェーズ1開発中',
+    color:C.app, bars:[{s:4,e:16,st:'doing'}],
+    status:'doing',
+    detail:'家業（銀座第一整骨院）の業務デジタル化のためHTML/CSS/JS単一ファイルで開発中。ブラウザだけで動き、データはlocalStorageで管理。フェーズ1（予約管理・見える化）開発中：日・週・月カレンダー、15分刻み予約スロット、担当者カラー分け（風間=青、川﨑=紫、椎森=ティール）、新患フラグ、キャンセル管理を実装済み。フェーズ2（打刻システム）、フェーズ3（領収証PDF）、フェーズ4（スケジュール管理）と続く予定。'
+  },
+
+  {type:'section', label:'業務ツール開発', color:C.tool},
+  {
+    id:'inquiry-tool',
+    label:'問い合わせ管理ツール', sub:'GAS + Claude API / 教育機関向け',
+    color:C.tool, bars:[{s:4,e:7,st:'done'},{s:7,e:22,st:'doing'}],
+    status:'multi',
+    detail:'勤務先（美術系教育機関）の問い合わせ業務効率化ツール。GoogleスプレッドシートのサイドパネルからClaude API（claude-sonnet-4-6）を呼び出し、返信下書きと確認事項を同時生成。エスカレーション自動フラグ・管理シートへの自動記録・ステータス色分け管理を実装。現在は個人のGoogleアカウントで動作確認済み。今後はGoogle Workspace Education上位プランへの切り替え稟議を経て正式環境に移植予定。'
+  },
+
+  {type:'section', label:'スキル学習', color:C.learn},
+  {
+    id:'sql',
+    label:'SQL 学習', sub:'SELECT / JOIN / GROUP BY → Kaggle実践',
+    color:C.learn, bars:[{s:8,e:16,st:'todo'}],
+    status:'todo',
+    detail:'フェーズ3（7〜9月）で着手予定。SELECT・JOIN・GROUP BYの基礎習得後、KaggleのTMDBデータセットで実践演習。将来はClaude Codeでクエリ分析を実践する予定。'
+  },
+  {
+    id:'python',
+    label:'Python（pandas）学習', sub:'ETL自動化への応用を目標',
+    color:C.learn, bars:[{s:20,e:28,st:'todo'}],
+    status:'todo',
+    detail:'フェーズ4（10〜12月）で着手予定。Google Colabで基礎学習後、映画データの自動収集・集計パイプラインをClaude Codeで構築することを目標とする。最終目標はCSV取得→Python整形→Tableau可視化→レポート作成までの半自動化ワークフロー。'
+  },
+
+  {type:'section', label:'書類準備・面接', color:C.job},
+  {
+    id:'docs',
+    label:'職務経歴書・ビズリーチ', sub:'エンタメ×データ分析職向け・改訂版完成',
+    color:C.job, bars:[{s:0,e:6,st:'done'},{s:28,e:33,st:'todo'}],
+    status:'multi',
+    detail:'5〜6月（6月6日）に完成。キャッチコピー「映画バリューチェーンを現場で知るバックエンド型データアナリスト候補」を軸に、職歴・スキル・自己PR・ポートフォリオURLを整備。12月に最終版を仕上げて正式応募へ。'
+  },
+  {
+    id:'interview',
+    label:'応募・面接', sub:'OB訪問・LinkedIn接触含む',
+    color:C.job, bars:[{s:20,e:33,st:'todo'}],
+    status:'todo',
+    detail:'フェーズ4〜5（10月〜）。職務経歴書最終版の仕上げ、面接練習、OB訪問・LinkedIn接触を経てエンタメ×データ分析系企業に正式応募。2026年12月末に派遣契約終了→2027年1月が目標目安。'
+  },
+
+  {type:'section', label:'株・資産管理', color:C.stock},
+  {
+    id:'dividend',
+    label:'配当ダッシュボード', sub:'SBI・楽天・フロッギー統合・DEMO公開済み',
+    color:C.stock, bars:[{s:5,e:6,st:'done'}],
+    status:'done',
+    detail:'SBI証券（162件・29銘柄）、楽天証券（116件・20銘柄）、フロッギー（448件・87銘柄）のCSVデータを統合したHTML/JSダッシュボード。タブ式UI（概要・SBI・楽天・フロッギー）、期間フィルター、KPIカード、月別棒グラフ（ホバーで銘柄内訳）を実装。実データは非公開で、匿名化・金額スケール変換したDEMO版をポートフォリオに公開中。公開先: https://pa-papapa.github.io/dividend/'
+  },
+
+  {type:'section', label:'ポートフォリオサイト', color:C.site},
+  {
+    id:'portfolio',
+    label:'GitHub Pages 整備', sub:'トップページ新設・構成見直し・継続更新',
+    color:C.site, bars:[{s:5,e:7,st:'done'},{s:7,e:28,st:'doing'}],
+    status:'multi',
+    detail:'サイト名「Cumhra Leoithne（クーラ・レヒナ）」。アイルランド語で「かおりのそよ風」という意味の造語名。Apps（Cinema Select・MOVICO）、Data（Tableauダッシュボード・公開待ち）、Side Projects（配当ダッシュボードDEMO）、Resume（未作成）の4カテゴリ構成。中身が充実したら本名に切り替え予定。公開先: https://pa-papapa.github.io/'
+  },
+];
+
+function buildGantt() {
+  const table = document.getElementById('gantt');
+
+  // thead
+  const thead = table.createTHead();
+  const trHead = thead.insertRow();
+  const thLabel = document.createElement('th');
+  thLabel.style.textAlign = 'left';
+  thLabel.style.minWidth = '155px';
+  trHead.appendChild(thLabel);
+
+  MONTH_LABELS.forEach((m, mi) => {
+    const n = MONTH_COLS[mi];
+    for (let c = 0; c < n; c++) {
+      const th = document.createElement('th');
+      if (c === 0) {
+        th.className = 'month-start';
+        th.textContent = m;
+        th.colSpan = 1;
+      }
+      trHead.appendChild(th);
+    }
+  });
+
+  // tbody
+  const tbody = table.createTBody();
+
+  rows.forEach(row => {
+    const tr = tbody.insertRow();
+
+    if (row.type === 'section') {
+      tr.className = 'section-row';
+      const td = tr.insertCell();
+      td.colSpan = TOTAL + 1;
+      td.textContent = row.label;
+      if (row.color) {
+        td.classList.add('has-color');
+        td.style.setProperty('--s-color', row.color);
+      }
+      return;
+    }
+
+    tr.className = 'data-row';
+    tr.dataset.id = row.id;
+
+    // label cell with color left-border
+    const tdLabel = tr.insertCell();
+    tdLabel.className = 'row-label';
+    tdLabel.style.borderLeftColor = row.color;
+    tdLabel.innerHTML = `<div class="title">${row.label}</div><div class="sub">${row.sub}</div>`;
+
+    // bar map
+    const map = new Array(TOTAL).fill(null);
+    row.bars.forEach(b => {
+      for (let c = b.s; c < b.e && c < TOTAL; c++) map[c] = b.st;
+    });
+
+    for (let c = 0; c < TOTAL; c++) {
+      const td = tr.insertCell();
+      td.className = 'cell';
+      if (MONTH_STARTS.includes(c) && c > 0) td.classList.add('month-start');
+      if (c === TODAY) td.classList.add('today-col');
+
+      if (map[c]) {
+        const bar = document.createElement('div');
+        bar.className = `bar ${map[c]}`;
+        bar.style.background = row.color;
+        td.appendChild(bar);
+      }
+    }
+
+    // click to show detail
+    tr.addEventListener('click', () => showDetail(row));
+  });
+}
+
+let currentId = null;
+
+function showDetail(row) {
+  const overlay = document.getElementById('overlay');
+  const dotEl   = document.getElementById('d-dot');
+  const titleEl = document.getElementById('d-title');
+  const bodyEl  = document.getElementById('d-body');
+  const statusEl= document.getElementById('d-status');
+
+  dotEl.style.background = row.color;
+  titleEl.textContent = row.label;
+  bodyEl.textContent  = row.detail;
+
+  const statusMap = {
+    done:  { text: '✅ 完了',        cls: 'done' },
+    doing: { text: '🔵 進行中',      cls: 'doing' },
+    todo:  { text: '⬜ 予定',        cls: 'todo' },
+    multi: { text: '✅ / 🔵 完了＋継続', cls: 'multi' },
+  };
+  const s = statusMap[row.status] || statusMap.todo;
+  statusEl.textContent = s.text;
+  statusEl.className   = `d-status ${s.cls}`;
+
+  overlay.classList.add('open');
+  currentId = row.id;
+}
+
+function closePopup() {
+  document.getElementById('overlay').classList.remove('open');
+  currentId = null;
+}
+
+document.getElementById('popup-close').addEventListener('click', closePopup);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closePopup();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
+
+buildGantt();
+</script>
+</body>
+</html>
