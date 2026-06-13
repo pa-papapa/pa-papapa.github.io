@@ -32,7 +32,6 @@
     flex-direction: column;
   }
 
-  /* ── HEADER ── */
   header {
     padding: 80px 40px 60px;
     max-width: 960px;
@@ -66,35 +65,23 @@
     flex-wrap: wrap;
   }
 
-  .tagline span {
-    position: relative;
-  }
-
+  .tagline span { position: relative; }
   .tagline span::after {
     content: '/';
     position: absolute;
     right: -12px;
     color: var(--dim);
   }
+  .tagline span:last-child::after { display: none; }
 
-  .tagline span:last-child::after {
-    display: none;
-  }
-
-  /* ── DIVIDER ── */
   .divider {
     max-width: 960px;
     margin: 0 auto 52px;
     padding: 0 40px;
     width: 100%;
   }
+  .divider hr { border: none; border-top: 1px solid var(--border); }
 
-  .divider hr {
-    border: none;
-    border-top: 1px solid var(--border);
-  }
-
-  /* ── GRID ── */
   .grid {
     max-width: 960px;
     margin: 0 auto;
@@ -105,13 +92,11 @@
     gap: 16px;
   }
 
-  /* ── CARD ── */
   .card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 28px 30px;
-    cursor: default;
     transition: border-color 0.3s ease, background 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -127,14 +112,8 @@
     transition: opacity 0.3s ease;
   }
 
-  .card:hover {
-    border-color: var(--border-hover);
-    background: #161929;
-  }
-
-  .card:hover::before {
-    opacity: 1;
-  }
+  .card:hover { border-color: var(--border-hover); background: #161929; }
+  .card:hover::before { opacity: 1; }
 
   .card-label {
     font-family: 'DM Mono', monospace;
@@ -162,12 +141,7 @@
     margin-bottom: 20px;
   }
 
-  /* ── WORKS LIST ── */
-  .works {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+  .works { display: flex; flex-direction: column; gap: 8px; }
 
   .work-item {
     display: flex;
@@ -181,10 +155,7 @@
     text-decoration: none;
   }
 
-  .work-item:hover {
-    border-color: var(--gold-dim);
-    background: #0f1120;
-  }
+  .work-item:hover { border-color: var(--gold-dim); background: #0f1120; }
 
   .work-item.coming-soon {
     opacity: 0.4;
@@ -200,19 +171,10 @@
     flex-shrink: 0;
   }
 
-  .work-item.coming-soon .work-dot {
-    background: var(--dim);
-  }
+  .work-item.coming-soon .work-dot { background: var(--dim); }
 
-  .work-name {
-    font-size: 12px;
-    color: var(--text);
-    flex: 1;
-  }
-
-  .work-item.coming-soon .work-name {
-    color: var(--muted);
-  }
+  .work-name { font-size: 12px; color: var(--text); flex: 1; }
+  .work-item.coming-soon .work-name { color: var(--muted); }
 
   .work-tag {
     font-family: 'DM Mono', monospace;
@@ -221,7 +183,6 @@
     letter-spacing: 0.1em;
   }
 
-  /* ── FOOTER ── */
   footer {
     margin-top: auto;
     padding: 24px 40px;
@@ -242,7 +203,6 @@
     letter-spacing: 0.1em;
   }
 
-  /* ── RESPONSIVE ── */
   @media (max-width: 640px) {
     header { padding: 52px 24px 40px; }
     .divider { padding: 0 24px; }
@@ -256,10 +216,10 @@
 <header>
   <h1 class="name">Cumhra <em>Leoithne</em></h1>
   <div class="tagline">
-    <span>culture</span>
-    <span>media</span>
+    <span>apps</span>
     <span>data</span>
-    <span>personal</span>
+    <span>side projects</span>
+    <span>resume</span>
   </div>
 </header>
 
@@ -267,13 +227,13 @@
 
 <main class="grid">
 
-  <!-- CULTURE -->
+  <!-- APPS -->
   <div class="card">
-    <div class="card-label">01 — culture</div>
-    <div class="card-title">Film, Art &amp; Cinema</div>
-    <div class="card-desc">映画・美術・興行にまつわる作品と記録。</div>
+    <div class="card-label">01 — apps</div>
+    <div class="card-title">Applications</div>
+    <div class="card-desc">制作したWebアプリケーション。</div>
     <div class="works">
-      <a href="https://pa-papapa.github.io/" target="_blank" rel="noopener" class="work-item">
+      <a href="./cinema-select/" target="_blank" rel="noopener" class="work-item">
         <div class="work-dot"></div>
         <span class="work-name">Cinema Select</span>
         <span class="work-tag">web app</span>
@@ -286,24 +246,10 @@
     </div>
   </div>
 
-  <!-- MEDIA -->
-  <div class="card">
-    <div class="card-label">02 — media</div>
-    <div class="card-title">TV, Press &amp; Distribution</div>
-    <div class="card-desc">テレビ・新聞・配給にまつわるプロジェクト。</div>
-    <div class="works">
-      <div class="work-item coming-soon">
-        <div class="work-dot"></div>
-        <span class="work-name">coming soon</span>
-        <span class="work-tag">—</span>
-      </div>
-    </div>
-  </div>
-
   <!-- DATA -->
   <div class="card">
-    <div class="card-label">03 — data</div>
-    <div class="card-title">Analysis &amp; Visualisation</div>
+    <div class="card-label">02 — data</div>
+    <div class="card-title">Data & Visualisation</div>
     <div class="card-desc">データ分析・可視化・ダッシュボード。</div>
     <div class="works">
       <div class="work-item coming-soon">
@@ -319,10 +265,10 @@
     </div>
   </div>
 
-  <!-- PERSONAL -->
+  <!-- SIDE PROJECTS -->
   <div class="card">
-    <div class="card-label">04 — personal</div>
-    <div class="card-title">Side Projects</div>
+    <div class="card-label">03 — side projects</div>
+    <div class="card-title">Personal Projects</div>
     <div class="card-desc">趣味・個人プロジェクト。</div>
     <div class="works">
       <a href="./dividend/" target="_blank" rel="noopener" class="work-item">
@@ -330,6 +276,20 @@
         <span class="work-name">Dividend Dashboard</span>
         <span class="work-tag">demo</span>
       </a>
+      <div class="work-item coming-soon">
+        <div class="work-dot"></div>
+        <span class="work-name">coming soon</span>
+        <span class="work-tag">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESUME -->
+  <div class="card">
+    <div class="card-label">04 — resume</div>
+    <div class="card-title">Profile & Resume</div>
+    <div class="card-desc">職務経歴・スキル・経験について。</div>
+    <div class="works">
       <div class="work-item coming-soon">
         <div class="work-dot"></div>
         <span class="work-name">coming soon</span>
